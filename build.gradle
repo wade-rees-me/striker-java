@@ -1,0 +1,88 @@
+plugins {
+	id 'java'
+	id 'application'
+	id 'com.github.johnrengelman.shadow' version '7.0.0' // Apply Shadow plugin for fat JARs
+}
+
+group = 'me.rees.striker'
+version = '1.0'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Gson library for JSON handling
+	implementation 'com.google.code.gson:gson:2.8.5'
+	
+	// JUnit for testing (optional)
+	testImplementation 'junit:junit:4.13.2'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+application {
+	mainClassName = 'me.rees.striker.Main'
+}
+
+jar {
+	manifest {
+		attributes(
+			'Main-Class': 'me.rees.striker.Main'
+		)
+	}
+}
+
+shadowJar {
+	archiveBaseName.set('striker')	// The base name of the JAR
+	archiveClassifier.set('')		// No classifier, to ensure it's a standard JAR
+	archiveVersion.set('1.0.0')		// Optional: set the version
+	manifest {
+		attributes 'Main-Class': 'me.rees.striker.Main'
+	}
+
+	doFirst {
+		println 'start shadow'
+	}
+	doLast {
+		println 'end shadow'
+	}
+}
+
+// Task to copy JAR to ./lib directory
+task copyJar(type: Copy) {
+	from "$buildDir/libs"	// Source directory where the JAR is generated
+	into "./lib"			// Destination directory
+	include '**/*.jar'		// Only include JAR files
+
+	doFirst {
+		println 'start copy'
+	}
+	doLast {
+		println 'end copy'
+	}
+}
+
+// Ensure the copy task runs after the JAR is created
+tasks.named('build').configure {
+    finalizedBy('copyJar')
+}
+
+
+
+test {
+	useJUnitPlatform()
+}
+
+
+
+task hello {
+	doFirst {
+		print 'Hello'
+	}
+	doLast {
+		println ' World'
+	}
+}
+
