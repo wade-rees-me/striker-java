@@ -83,6 +83,7 @@ public class Simulator {
 
     // Insert simulation results into the database
     private void simulatorInsert(DatabaseTable sdt, String playbook) {
+        parameters.getLogger().simulation("\n  -- insert ----------------------------------------------------------------------\n");
 		try {
             URL url = new URL(String.format("http://%s/%s/%s/%s", Constants.getSimulationUrl(), sdt.getSimulator(), playbook, sdt.getName()));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -127,6 +128,7 @@ public class Simulator {
             e.printStackTrace();
             throw new RuntimeException("Failed to insert simulation data");
         }
+        parameters.getLogger().simulation("\n  --------------------------------------------------------------------------------\n");
     }
 
     // Print results after simulation
@@ -134,8 +136,10 @@ public class Simulator {
         parameters.getLogger().simulation("\n  -- results ---------------------------------------------------------------------\n");
         parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Number of hands", Utilities.addCommas(report.getTotalHands())));
         parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Number of rounds", Utilities.addCommas(report.getTotalRounds())));
-        parameters.getLogger().simulation(String.format("    %-24s: %d %+04.3f average bet per hand\n", "Total bet", report.getTotalBet(), (double) report.getTotalBet() / report.getTotalHands()));
-        parameters.getLogger().simulation(String.format("    %-24s: %d %+04.3f average won per hand\n", "Total won", report.getTotalWon(), (double) report.getTotalWon() / report.getTotalHands()));
+        parameters.getLogger().simulation(String.format("    %-24s: %s %+04.3f average bet per hand\n", "Total bet", Utilities.addCommas(report.getTotalBet()),
+			(double) report.getTotalBet() / report.getTotalHands()));
+        parameters.getLogger().simulation(String.format("    %-24s: %s %+04.3f average won per hand\n", "Total won", Utilities.addCommas(report.getTotalWon()),
+			(double) report.getTotalWon() / report.getTotalHands()));
         parameters.getLogger().simulation(String.format("    %-24s: %s seconds\n", "Total time", Utilities.addCommas(report.getDuration())));
         parameters.getLogger().simulation(String.format("    %-24s: %s per 1,000,000 hands\n", "Average time", dbTable.getAverageTime()));
         parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Player advantage", dbTable.getAdvantage()));
