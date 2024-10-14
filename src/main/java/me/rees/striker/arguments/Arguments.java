@@ -19,8 +19,8 @@ public class Arguments {
     private boolean doubleDeckFlag = false;
     private boolean sixShoeFlag = false;
 
-    // Parse command-line flags for simulation
-    public void parseArguments(String[] args) {
+	//
+    public Arguments(String[] args) {
         Map<String, Runnable> argHandlers = new HashMap<>();
         argHandlers.put("-M", () -> mimicFlag = true);
         argHandlers.put("--mimic", () -> mimicFlag = true);

@@ -1,6 +1,5 @@
 package me.rees.striker.table;
 
-import me.rees.striker.logger.Logger;
 import me.rees.striker.constants.Constants;
 
 import com.google.gson.JsonArray;
@@ -38,6 +37,16 @@ public class Rules {
     private int blackjackBets = 3;
     private float penetration = 0.70f;
 
+    //
+    public Rules(String decks) {
+        try {
+            rulesFetchTable("http://" + Constants.getRulesUrl() + "/" + decks);
+        } catch (Exception e) {
+            System.err.println("Error fetching rules table: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
 	//
 	public String getPlaybook() {
 		return this.playbook;
@@ -69,16 +78,6 @@ public class Rules {
 	public float getPenetration() {
 		return this.penetration;
 	}
-
-    //
-    public void rulesLoadTable(String decks) {
-        try {
-            rulesFetchTable("http://" + Constants.getRulesUrl() + "/" + decks);
-        } catch (Exception e) {
-            System.err.println("Error fetching rules table: " + e.getMessage());
-            System.exit(1);
-        }
-    }
 
     //
     private void rulesFetchTable(String url) throws Exception {
@@ -133,18 +132,18 @@ public class Rules {
     }
 
     //
-    public void print(Logger logger) {
-        logger.simulation(String.format("    %-24s\n", "Table Rules"));
-        logger.simulation(String.format("      %-24s: %s\n", "Table", playbook));
-        logger.simulation(String.format("      %-24s: %s\n", "Hit soft 17", hitSoft17 ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %s\n", "Surrender", surrender ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %s\n", "Double any two cards", doubleAnyTwoCards ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %s\n", "Double after split", doubleAfterSplit ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %s\n", "Resplit aces", resplitAces ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %s\n", "Hit split aces", hitSplitAces ? "true" : "false"));
-        logger.simulation(String.format("      %-24s: %d\n", "Blackjack bets", blackjackBets));
-        logger.simulation(String.format("      %-24s: %d\n", "Blackjack pays", blackjackPays));
-        logger.simulation(String.format("      %-24s: %.3f %%\n", "Penetration", penetration));
+    public void print() {
+        System.out.println(String.format("    %-24s", "Table Rules"));
+        System.out.println(String.format("      %-24s: %s", "Table", playbook));
+        System.out.println(String.format("      %-24s: %s", "Hit soft 17", hitSoft17 ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Surrender", surrender ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Double any two cards", doubleAnyTwoCards ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Double after split", doubleAfterSplit ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Resplit aces", resplitAces ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Hit split aces", hitSplitAces ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %d", "Blackjack bets", blackjackBets));
+        System.out.println(String.format("      %-24s: %d", "Blackjack pays", blackjackPays));
+        System.out.println(String.format("      %-24s: %.3f %%", "Penetration", penetration));
     }
 }
 

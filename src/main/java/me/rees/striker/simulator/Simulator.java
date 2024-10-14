@@ -5,9 +5,7 @@ import me.rees.striker.arguments.Parameters;
 import me.rees.striker.arguments.Arguments;
 import me.rees.striker.arguments.Report;
 import me.rees.striker.simulator.Simulator;
-import me.rees.striker.logger.Logger;
 import me.rees.striker.constants.Constants;
-import me.rees.striker.utilities.Utilities;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,21 +25,21 @@ public class Simulator {
     private Report report;
 
 	//
-    public Simulator(Parameters parameters) {
+    public Simulator(Parameters parameters, Rules rules) {
         this.parameters = parameters;
-        this.table = new Table(parameters);
+        this.table = new Table(parameters, rules);
         this.report = new Report();
     }
 
     // The main simulator process
     public void simulatorRunOnce() throws IOException {
-        DatabaseTable dbTable = new DatabaseTable();
+        Simulation dbTable = new Simulation();
 
-        parameters.getLogger().simulation(String.format("  Start: simulation %s\n", parameters.getName()));
+        System.out.println(String.format("  Start: simulation %s", parameters.getName()));
         simulatorRunSimulation();
-        parameters.getLogger().simulation(String.format("  End: simulation\n"));
+        System.out.println(String.format("  End: simulation"));
 
-        // Populate DatabaseTable
+        // Populate Simulation
         dbTable.setPlaybook(parameters.getPlaybook());
         dbTable.setName(parameters.getName());
         dbTable.setSimulator(Constants.STRIKER_WHO_AM_I);
@@ -70,9 +68,9 @@ public class Simulator {
 
     // Run the simulation
     private void simulatorRunSimulation() throws IOException {
-        parameters.getLogger().simulation("    Start: " + parameters.getStrategy() + " table session\n");
+        System.out.println("    Start: " + parameters.getStrategy() + " table session");
         table.session(parameters.getStrategy().equals("mimic"));
-        parameters.getLogger().simulation("    End: table session\n");
+        System.out.println("    End: table session");
 
         report.setTotalBet(report.getTotalBet() + table.getPlayer().getReport().getTotalBet());
         report.setTotalWon(report.getTotalWon() + table.getPlayer().getReport().getTotalWon());
@@ -82,8 +80,8 @@ public class Simulator {
     }
 
     // Insert simulation results into the database
-    private void simulatorInsert(DatabaseTable sdt, String playbook) {
-        parameters.getLogger().simulation("\n  -- insert ----------------------------------------------------------------------\n");
+    private void simulatorInsert(Simulation sdt, String playbook) {
+        System.out.println("\n  -- insert ----------------------------------------------------------------------");
 		try {
             URL url = new URL(String.format("http://%s/%s/%s/%s", Constants.getSimulationUrl(), sdt.getSimulator(), playbook, sdt.getName()));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -128,22 +126,20 @@ public class Simulator {
             e.printStackTrace();
             throw new RuntimeException("Failed to insert simulation data");
         }
-        parameters.getLogger().simulation("\n  --------------------------------------------------------------------------------\n");
+        System.out.println("\n  --------------------------------------------------------------------------------");
     }
 
     // Print results after simulation
-    private void printReport(DatabaseTable dbTable) throws IOException {
-        parameters.getLogger().simulation("\n  -- results ---------------------------------------------------------------------\n");
-        parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Number of hands", Utilities.addCommas(report.getTotalHands())));
-        parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Number of rounds", Utilities.addCommas(report.getTotalRounds())));
-        parameters.getLogger().simulation(String.format("    %-24s: %s %+04.3f average bet per hand\n", "Total bet", Utilities.addCommas(report.getTotalBet()),
-			(double) report.getTotalBet() / report.getTotalHands()));
-        parameters.getLogger().simulation(String.format("    %-24s: %s %+04.3f average won per hand\n", "Total won", Utilities.addCommas(report.getTotalWon()),
-			(double) report.getTotalWon() / report.getTotalHands()));
-        parameters.getLogger().simulation(String.format("    %-24s: %s seconds\n", "Total time", Utilities.addCommas(report.getDuration())));
-        parameters.getLogger().simulation(String.format("    %-24s: %s per 1,000,000 hands\n", "Average time", dbTable.getAverageTime()));
-        parameters.getLogger().simulation(String.format("    %-24s: %s\n", "Player advantage", dbTable.getAdvantage()));
-        parameters.getLogger().simulation("  --------------------------------------------------------------------------------\n\n");
+    private void printReport(Simulation dbTable) throws IOException {
+        System.out.println("\n  -- results ---------------------------------------------------------------------");
+        System.out.println(String.format("    %-24d: %s", "Number of hands", report.getTotalHands()));
+        System.out.println(String.format("    %-24d: %s", "Number of rounds", report.getTotalRounds()));
+        System.out.println(String.format("    %-24d: %s %+04.3f average bet per hand", "Total bet", report.getTotalBet(), (double) report.getTotalBet() / report.getTotalHands()));
+        System.out.println(String.format("    %-24d: %s %+04.3f average won per hand", "Total won", report.getTotalWon(), (double) report.getTotalWon() / report.getTotalHands()));
+        System.out.println(String.format("    %-24d: %s seconds", "Total time", report.getDuration()));
+        System.out.println(String.format("    %-24s: %s per 1,000,000 hands", "Average time", dbTable.getAverageTime()));
+        System.out.println(String.format("    %-24s: %s", "Player advantage", dbTable.getAdvantage()));
+        System.out.println("  --------------------------------------------------------------------------------\n");
     }
 }
 

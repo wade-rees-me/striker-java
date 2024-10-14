@@ -1,19 +1,17 @@
 package me.rees.striker.arguments;
 
-import me.rees.striker.table.Rules;
-import me.rees.striker.logger.Logger;
+import me.rees.striker.constants.Constants;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.ZonedDateTime;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Parameters {
 	//
-    private Rules rules;
-    private Logger logger;
-
     private String name;
     private String playbook;
     private String processor;
@@ -24,17 +22,15 @@ public class Parameters {
     private long numberOfHands;
 
     // Constructor to initialize parameters
-    public Parameters(String name, String decks, String strategy, int numberOfDecks, long numberOfHands, Rules rules, Logger logger) {
-        this.name = name;
+    public Parameters(String decks, String strategy, int numberOfDecks, long numberOfHands) {
         this.decks = decks;
         this.strategy = strategy;
         this.numberOfDecks = numberOfDecks;
         this.numberOfHands = numberOfHands;
-        this.rules = rules;
-        this.logger = logger;
         this.playbook = decks + "-" + strategy;
         this.processor = "striker-java";  // Replace STRIKER_WHO_AM_I
         this.timestamp = getCurrentTime();
+        this.name = generateName();
     }
 
 	//
@@ -53,16 +49,6 @@ public class Parameters {
     }
 
 	//
-    public Logger getLogger() {
-		return this.logger;
-    }
-
-	//
-    public Rules getRules() {
-		return this.rules;
-    }
-
-	//
     public int getNumberOfDecks() {
 		return this.numberOfDecks;
     }
@@ -74,18 +60,12 @@ public class Parameters {
 
     // Print method to log simulation parameters
     public void print() {
-        logger.simulation(String.format("    %-24s: %s\n", "Name", name));
-        logger.simulation(String.format("    %-24s: %s\n", "Playbook", playbook));
-        logger.simulation(String.format("    %-24s: %s\n", "Processor", processor));
-        logger.simulation(String.format("    %-24s: %s\n", "Version", "v01.02.02"));  // Replace STRIKER_VERSION
-        logger.simulation(String.format("    %-24s: %,d\n", "Number of hands", numberOfHands));
-        logger.simulation(String.format("    %-24s: %s\n", "Timestamp", timestamp));
-    }
-
-    // Function to get current timestamp in a formatted string
-    private String getCurrentTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
-        return ZonedDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).format(formatter);
+        System.out.println(String.format("    %-24s: %s", "Name", name));
+        System.out.println(String.format("    %-24s: %s", "Playbook", playbook));
+        System.out.println(String.format("    %-24s: %s", "Processor", processor));
+        System.out.println(String.format("    %-24s: %s", "Version", "v01.02.02"));  // Replace STRIKER_VERSION
+        System.out.println(String.format("    %-24s: %,d", "Number of hands", numberOfHands));
+        System.out.println(String.format("    %-24s: %s", "Timestamp", timestamp));
     }
 
     // Serialize the Parameters object to a JSON-like string
@@ -100,17 +80,21 @@ public class Parameters {
         json.append(String.format("\"strategy\": \"%s\",\n", strategy));
         json.append(String.format("\"number_of_hands\": %d,\n", numberOfHands));
         json.append(String.format("\"number_of_decks\": %d,\n", numberOfDecks));
-        json.append(String.format("\"hit_soft_17\": \"%s\",\n", rules.isHitSoft17() ? "true" : "false"));
-        json.append(String.format("\"surrender\": \"%s\",\n", rules.isSurrender() ? "true" : "false"));
-        json.append(String.format("\"double_any_two_cards\": \"%s\",\n", rules.isDoubleAnyTwoCards() ? "true" : "false"));
-        json.append(String.format("\"double_after_split\": \"%s\",\n", rules.isDoubleAfterSplit() ? "true" : "false"));
-        json.append(String.format("\"resplit_aces\": \"%s\",\n", rules.isResplitAces() ? "true" : "false"));
-        json.append(String.format("\"hit_split_aces\": \"%s\",\n", rules.isHitSplitAces() ? "true" : "false"));
-        json.append(String.format("\"blackjack_bets\": %d,\n", rules.getBlackjackBets()));
-        json.append(String.format("\"blackjack_pays\": %d,\n", rules.getBlackjackPays()));
-        json.append(String.format("\"penetration\": %.2f\n", rules.getPenetration()));
         json.append("}");
         return json.toString();
+    }
+
+    // Function to get current timestamp in a formatted string
+    private String getCurrentTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+        return ZonedDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).format(formatter);
+    }
+
+	//
+    private static String generateName() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HHmmss");
+        return String.format("%s_%s", Constants.STRIKER_WHO_AM_I, now.format(formatter));
     }
 }
 

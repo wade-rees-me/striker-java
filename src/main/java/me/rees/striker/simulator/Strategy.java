@@ -7,7 +7,6 @@ import me.rees.striker.table.Rules;
 import me.rees.striker.arguments.Parameters;
 import me.rees.striker.arguments.Arguments;
 import me.rees.striker.simulator.Simulator;
-import me.rees.striker.logger.Logger;
 import me.rees.striker.constants.Constants;
 import me.rees.striker.cards.Card;
 

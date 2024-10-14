@@ -1,6 +1,6 @@
 package me.rees.striker.simulator;
 
-public class DatabaseTable {
+public class Simulation {
 
     private String playbook;
     private String name;

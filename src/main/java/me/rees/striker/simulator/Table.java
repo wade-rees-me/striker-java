@@ -5,9 +5,7 @@ import me.rees.striker.arguments.Parameters;
 import me.rees.striker.arguments.Arguments;
 import me.rees.striker.arguments.Report;
 import me.rees.striker.simulator.Simulator;
-import me.rees.striker.logger.Logger;
 import me.rees.striker.constants.Constants;
-import me.rees.striker.utilities.Utilities;
 import me.rees.striker.cards.Hand;
 import me.rees.striker.cards.Shoe;
 import me.rees.striker.cards.Card;
@@ -31,11 +29,11 @@ public class Table {
     private Report report;
 
 	//
-    public Table(Parameters parameters) {
+    public Table(Parameters parameters, Rules rules) {
         this.parameters = parameters;
-        this.shoe = new Shoe(parameters.getNumberOfDecks(), parameters.getRules().getPenetration());
-        this.dealer = new Dealer(parameters.getRules().isHitSoft17());
-        this.player = new Player(parameters, shoe.getNumberOfCards());
+        this.shoe = new Shoe(parameters.getNumberOfDecks(), rules.getPenetration());
+        this.dealer = new Dealer(rules.isHitSoft17());
+        this.player = new Player(parameters, rules, shoe.getNumberOfCards());
         this.report = new Report();
     }
 
@@ -51,7 +49,7 @@ public class Table {
 
 	//
     public void session(boolean mimic) {
-        parameters.getLogger().simulation(String.format("      Start: table, playing %s hands\n", Utilities.addCommas(parameters.getNumberOfHands())));
+        System.out.println(String.format("      Start: table, playing %s hands", parameters.getNumberOfHands()));
 
         report.setStart(Instant.now());
 
@@ -82,13 +80,13 @@ public class Table {
                 player.showCard(up);
             }
         }
-        parameters.getLogger().simulation("\n");
+        System.out.println();
 
         report.setEnd(Instant.now());
         long duration = report.getEnd().getEpochSecond() - report.getStart().getEpochSecond();
         report.setDuration(duration);
 
-        parameters.getLogger().simulation("      End: table\n");
+        System.out.println("      End: table");
     }
 
     public Card dealCards(Hand hand) {
@@ -107,14 +105,14 @@ public class Table {
 
     private void status(long round, long hand) {
         if (round == 0) {
-            parameters.getLogger().simulation("        ");
+            System.out.print("        ");
         }
         if ((round + 1) % STATUS_DOT == 0) {
-            parameters.getLogger().simulation(".");
+            System.out.print(".");
         }
         if ((round + 1) % STATUS_LINE == 0) {
-            parameters.getLogger().simulation(" : " + Utilities.addCommas(round + 1) + " (rounds), " + Utilities.addCommas(hand) + " (hands)\n");
-            parameters.getLogger().simulation("        ");
+            System.out.println(String.format(" : %d (rounds), %d (hands)", (round + 1), hand));
+            System.out.print("        ");
         }
     }
 }
