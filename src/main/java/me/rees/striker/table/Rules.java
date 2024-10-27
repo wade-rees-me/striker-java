@@ -6,13 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 //
-public class Rules {
+public class Rules extends Request {
 	//
 	private static final String PLAYBOOK = "playbook";
     private static final String HIT_SOFT_17 = "hitSoft17"; 
@@ -24,6 +19,8 @@ public class Rules {
     private static final String BLACKJACK_PAYS = "blackjackPays";
     private static final String BLACKJACK_BETS = "blackjackBets";
     private static final String PENETRATION = "penetration";
+    private static final String TRUE = "true";
+    private static final String FALSE = "false";
 
 	//
     private String playbook;
@@ -81,7 +78,7 @@ public class Rules {
 
     //
     private void rulesFetchTable(String url) throws Exception {
-        JsonObject json = httpGet(url);
+        JsonObject json = (new JsonParser()).parse(httpGet(url)).getAsJsonObject();
 
         String payloadString = json.get("payload").getAsString();
 		JsonObject payload = (new JsonParser()).parse(payloadString).getAsJsonObject();
@@ -98,52 +95,36 @@ public class Rules {
         this.penetration = payload.has(PENETRATION) ? (float)payload.get(PENETRATION).getAsFloat() : (float).50;
     }
 
-	//
-    public JsonObject httpGet(String url) {
-        HttpURLConnection connection = null;
-        try {
-            URL obj = new URL(url);
-            connection = (HttpURLConnection) obj.openConnection();
-            connection.setRequestMethod("GET");
-
-            // Read the response
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            // Parse JSON using Gson
-            JsonObject json = (new JsonParser()).parse(response.toString()).getAsJsonObject();
-            return json;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("HTTP request failed");
-
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-    }
-
     //
     public void print() {
         System.out.println(String.format("    %-24s", "Table Rules"));
         System.out.println(String.format("      %-24s: %s", "Table", playbook));
-        System.out.println(String.format("      %-24s: %s", "Hit soft 17", hitSoft17 ? "true" : "false"));
-        System.out.println(String.format("      %-24s: %s", "Surrender", surrender ? "true" : "false"));
-        System.out.println(String.format("      %-24s: %s", "Double any two cards", doubleAnyTwoCards ? "true" : "false"));
-        System.out.println(String.format("      %-24s: %s", "Double after split", doubleAfterSplit ? "true" : "false"));
-        System.out.println(String.format("      %-24s: %s", "Resplit aces", resplitAces ? "true" : "false"));
-        System.out.println(String.format("      %-24s: %s", "Hit split aces", hitSplitAces ? "true" : "false"));
+        System.out.println(String.format("      %-24s: %s", "Hit soft 17", hitSoft17 ? TRUE : FALSE));
+        System.out.println(String.format("      %-24s: %s", "Surrender", surrender ? TRUE : FALSE));
+        System.out.println(String.format("      %-24s: %s", "Double any two cards", doubleAnyTwoCards ? TRUE : FALSE));
+        System.out.println(String.format("      %-24s: %s", "Double after split", doubleAfterSplit ? TRUE : FALSE));
+        System.out.println(String.format("      %-24s: %s", "Resplit aces", resplitAces ? TRUE : FALSE));
+        System.out.println(String.format("      %-24s: %s", "Hit split aces", hitSplitAces ? TRUE : FALSE));
         System.out.println(String.format("      %-24s: %d", "Blackjack bets", blackjackBets));
         System.out.println(String.format("      %-24s: %d", "Blackjack pays", blackjackPays));
-        System.out.println(String.format("      %-24s: %.3f %%", "Penetration", penetration));
+        System.out.println(String.format("      %-24s: %.3f %%", PENETRATION, penetration));
+    }
+
+    //
+    public String serialize() {
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+		json.append(String.format("\"hit_soft_17\": \"%s\",\n", hitSoft17 ? TRUE : FALSE));
+		json.append(String.format("\"surrender\": \"%s\",\n", surrender ? TRUE : FALSE));
+		json.append(String.format("\"double_any_two_cards\": \"%s\",\n", doubleAnyTwoCards ? TRUE : FALSE));
+		json.append(String.format("\"double_after_split\": \"%s\",\n", doubleAfterSplit ? TRUE : FALSE));
+		json.append(String.format("\"resplit_aces\": \"%s\",\n", resplitAces ? TRUE : FALSE));
+		json.append(String.format("\"hit_split_aces\": \"%s\",\n", hitSplitAces ? TRUE : FALSE));
+		json.append(String.format("\"blackjack_bets\": \"%d\",\n", blackjackBets));
+		json.append(String.format("\"blackjack_pays\": \"%d\",\n", blackjackPays));
+		json.append(String.format("\"penetration\": \"%f\",\n", penetration));
+        json.append("}");
+        return json.toString();
     }
 }
 

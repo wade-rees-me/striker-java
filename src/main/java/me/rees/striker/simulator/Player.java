@@ -1,6 +1,7 @@
 package me.rees.striker.simulator;
 
 import me.rees.striker.table.Rules;
+import me.rees.striker.table.Strategy;
 import me.rees.striker.arguments.Parameters;
 import me.rees.striker.arguments.Arguments;
 import me.rees.striker.arguments.Report;
@@ -15,23 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-	private Parameters parameters;
 	private Rules rules;
+	private Strategy strategy;
 	private int numberOfCards;
 	private Wager wager;
 	private List<Wager> splits;
-	private Strategy strategy;
 	private Report report;
 	private int[] seenCards;
 
 	// Constructor for Player
-	public Player(Parameters parameters, Rules rules, int numberOfCards) {
-		this.parameters = parameters;
+	public Player(Rules rules, Strategy strategy, int numberOfCards) {
 		this.rules = rules;
+		this.strategy = strategy;
 		this.numberOfCards = numberOfCards;
 		this.wager = new Wager();
 		this.splits = new ArrayList<>();
-		this.strategy = new Strategy(parameters.getPlaybook(), numberOfCards);
 		this.report = new Report();
 		this.seenCards = new int[13]; // Keeps track of the cards the player has seen
 	}
@@ -78,32 +77,21 @@ public class Player {
 			return;
 		}
 
-		strategy.doPlay(seenCards, wager.getHaveCards(), wager.isPair() ? wager.getCardPair() : null, up);
-		if (rules.isSurrender() && strategy.getSurrender(seenCards, wager.getHaveCards(), up)) {
-			strategy.clear();
-			wager.surrender();
-			return;
-		}
-
-		if ((rules.isDoubleAnyTwoCards() || wager.getHandTotal() == 10 || wager.getHandTotal() == 11) && strategy.getDouble(seenCards, wager.getHaveCards(), up)) {
-			strategy.clear();
+		if (strategy.getDouble(seenCards, wager.getHandTotal(), wager.isSoft(), up)) {
 			wager.doubleBet();
 			drawCard(wager, shoe.drawCard());
 			return;
 		}
 
 		if (wager.isPair() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
-			strategy.clear();
 			Wager split = new Wager();
 			wager.splitHand(split);
 			splits.add(split);
 
 			if (wager.isPairOfAces()) {
-				if (!rules.isResplitAces() && !rules.isHitSplitAces()) {
-					drawCard(wager, shoe.drawCard());
-					drawCard(split, shoe.drawCard());
-					return;
-				}
+				drawCard(wager, shoe.drawCard());
+				drawCard(split, shoe.drawCard());
+				return;
 			}
 
 			drawCard(wager, shoe.drawCard());
@@ -113,50 +101,34 @@ public class Player {
 			return;
 		}
 
-		boolean doStand = strategy.getStand(seenCards, wager.getHaveCards(), up);
-		strategy.clear();
+		boolean doStand = strategy.getStand(seenCards, wager.getHandTotal(), wager.isSoft(), up);
 		while (!wager.isBusted() && !doStand) {
 			drawCard(wager, shoe.drawCard());
-			doStand = strategy.getStand(seenCards, wager.getHaveCards(), up);
+			if (!wager.isBusted()) {
+				doStand = strategy.getStand(seenCards, wager.getHandTotal(), wager.isSoft(), up);
+			}
 		}
 	}
 
 	// Play the split hand
 	private void playSplit(Wager wager, Shoe shoe, Card up) {
-		if (rules.isDoubleAfterSplit() && strategy.getDouble(seenCards, wager.getHaveCards(), up)) {
-			wager.doubleBet();
+		if (wager.isPair() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
+			Wager split = new Wager();
+			splits.add(split);
+			wager.splitHand(split);
 			drawCard(wager, shoe.drawCard());
+			playSplit(wager, shoe, up);
+			drawCard(split, shoe.drawCard());
+			playSplit(split, shoe, up);
 			return;
 		}
 
-		if (wager.isPair()) {
-			if (wager.isPairOfAces()) {
-				if (rules.isResplitAces() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
-					Wager split = new Wager();
-					splits.add(split);
-					wager.splitHand(split);
-					drawCard(wager, shoe.drawCard());
-					playSplit(wager, shoe, up);
-					drawCard(split, shoe.drawCard());
-					playSplit(split, shoe, up);
-					return;
-				}
-			} else if (strategy.getSplit(seenCards, wager.getCardPair(), up)) {
-				Wager split = new Wager();
-				splits.add(split);
-				wager.splitHand(split);
-				drawCard(wager, shoe.drawCard());
-				playSplit(wager, shoe, up);
-				drawCard(split, shoe.drawCard());
-				playSplit(split, shoe, up);
-				return;
-			}
-		}
-
-		boolean doStand = strategy.getStand(seenCards, wager.getHaveCards(), up);
+		boolean doStand = strategy.getStand(seenCards, wager.getHandTotal(), wager.isSoft(), up);
 		while (!wager.isBusted() && !doStand) {
 			drawCard(wager, shoe.drawCard());
-			doStand = strategy.getStand(seenCards, wager.getHaveCards(), up);
+			if (!wager.isBusted()) {
+				doStand = strategy.getStand(seenCards, wager.getHandTotal(), wager.isSoft(), up);
+			}
 		}
 	}
 
@@ -198,12 +170,6 @@ public class Player {
 
 	// Payoff for the hand
 	private void payoffHand(Wager wager, boolean dealerBlackjack, boolean dealerBusted, int dealerTotal) {
-		if (wager.didSurrender()) {
-			report.setTotalBet(report.getTotalBet() + wager.getAmountBet());
-			report.setTotalWon(report.getTotalWon() - wager.getAmountBet() / 2);
-			return;
-		}
-
 		if (dealerBlackjack) {
 			wager.wonInsurance();
 			if (wager.isBlackjack()) {

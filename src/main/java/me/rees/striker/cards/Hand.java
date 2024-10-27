@@ -6,10 +6,9 @@ import java.util.List;
 public class Hand {
 	//
 	private List<Card> cards;
-	private int[] haveCards = new int[13];	// Number of each card in the hand
+	//private int[] haveCards = new int[13];	// Number of each card in the hand
 	private int handTotal = 0;				// Total value of the hand
 	private int softAce = 0;				// Number of soft aces (11 valued aces)
-	private boolean handSurrendered = false;
 
 	// Constructor
 	public Hand() {
@@ -20,11 +19,10 @@ public class Hand {
 	public void reset() {
 		handTotal = 0;
 		softAce = 0;
-		handSurrendered = false;
 		cards = new ArrayList<>();
-		for (int i = 0; i < haveCards.length; i++) {
-			haveCards[i] = 0;
-		}
+		//for (int i = 0; i < haveCards.length; i++) {
+			//haveCards[i] = 0;
+		//}
 	}
 
 	// Draw a card and add it to the hand
@@ -85,35 +83,27 @@ public class Hand {
 		return handTotal;
 	}
 
+/*
 	// Get the array of cards in the hand
 	public int[] getHaveCards() {
 		return haveCards;
 	}
-
-	// Mark the hand as surrendered
-	public void surrender() {
-		handSurrendered = true;
-	}
-
-	// Check if the hand was surrendered
-	public boolean didSurrender() {
-		return handSurrendered;
-	}
+*/
 
 	// Calculate the total value of the hand
 	private void calculateTotal() {
 		handTotal = 0;
 		softAce = 0;
-		for (int i = 0; i < haveCards.length; i++) {
-			haveCards[i] = 0;
-		}
+		//for (int i = 0; i < haveCards.length; i++) {
+			//haveCards[i] = 0;
+		//}
 
 		for (Card card : cards) {
 			handTotal += card.getValue();
 			if (card.getValue() == 11) {
 				softAce++;
 			}
-			haveCards[card.getOffset()]++;
+			//haveCards[card.getOffset()]++;
 		}
 
 		// Adjust the hand total if it's over 21 and there are soft aces

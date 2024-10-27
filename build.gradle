@@ -1,47 +1,53 @@
+// Apply necessary plugins
 plugins {
-	id 'java'
-	id 'application'
-	id 'com.github.johnrengelman.shadow' version '7.0.0' // Apply Shadow plugin for fat JARs
+	id 'java'													// Basic Java plugin
+	id 'application'											// Plugin for running Java applications
+	id 'com.github.johnrengelman.shadow' version '7.0.0'		// Apply Shadow plugin for creating fat JARs (self-contained)
 }
 
-group = 'me.rees.striker'
-version = '1.0'
+// Project details
+group = 'me.rees.striker'										// Define the group for project
+version = '1.0'													// Project version
 
+// Define repositories for dependencies
 repositories {
-	mavenCentral()
+	mavenCentral()												// Use Maven Central to fetch dependencies
 }
 
+// Dependencies block
 dependencies {
-	// Gson library for JSON handling
-	implementation 'com.google.code.gson:gson:2.8.5'
-	
-	// JUnit for testing (optional)
-	testImplementation 'junit:junit:4.13.2'
+	implementation 'com.google.code.gson:gson:2.8.5'			// Gson library for handling JSON parsing/serialization
+	testImplementation 'junit:junit:4.13.2'						// JUnit testing framework for unit tests
 }
 
+// Set the source and target compatibility to Java 1.8
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+// Configuration for the 'application' plugin
 application {
-	mainClassName = 'me.rees.striker.Main'
+	mainClassName = 'me.rees.striker.Main';						// Define the main class of the project
 }
 
+// Customize the JAR task
 jar {
 	manifest {
 		attributes(
-			'Main-Class': 'me.rees.striker.Main'
+			'Main-Class': 'me.rees.striker.Main'				// Specify the main class for the JAR manifest
 		)
 	}
 }
 
+// Shadow plugin configuration to create fat JARs
 shadowJar {
-	archiveBaseName.set('striker')	// The base name of the JAR
-	archiveClassifier.set('')		// No classifier, to ensure it's a standard JAR
-	archiveVersion.set('1.0.0')		// Optional: set the version
+	archiveBaseName.set('striker')								// Set the base name of the JAR
+	archiveClassifier.set('')									// No classifier to ensure it's treated as the main JAR
+	archiveVersion.set('1.0.0')									// Set version of the JAR (optional)
 	manifest {
-		attributes 'Main-Class': 'me.rees.striker.Main'
+		attributes 'Main-Class': 'me.rees.striker.Main'			// Specify the main class in the manifest of the fat JAR
 	}
 
+	// Add logging for task execution
 	doFirst {
 		println 'start shadow'
 	}
@@ -50,12 +56,13 @@ shadowJar {
 	}
 }
 
-// Task to copy JAR to ./lib directory
+// Custom task to copy the JAR file to the `./lib` directory
 task copyJar(type: Copy) {
-	from "$buildDir/libs"	// Source directory where the JAR is generated
-	into "./lib"			// Destination directory
-	include '**/*.jar'		// Only include JAR files
+	from "$buildDir/libs"										// Specify source directory where JAR is generated
+	into "./lib"												// Destination directory for the JAR
+	include '**/*.jar'											// Include all JAR files
 
+	// Add logging for task execution
 	doFirst {
 		println 'start copy'
 	}
@@ -64,19 +71,17 @@ task copyJar(type: Copy) {
 	}
 }
 
-// Ensure the copy task runs after the JAR is created
+// Ensure the copyJar task runs after the build task finishes
 tasks.named('build').configure {
-    finalizedBy('copyJar')
+	finalizedBy('copyJar')
 }
 
-
-
+// Configure test task to use JUnit
 test {
 	useJUnitPlatform()
 }
 
-
-
+// Simple 'hello' task for demonstration purposes
 task hello {
 	doFirst {
 		print 'Hello'
