@@ -13,8 +13,8 @@ public class Constants {
 	public static final long DATABASE_NUMBER_OF_HANDS = 250000000;
 
 	// Betting constants
-	public static final int MAXIMUM_BET = 80;
 	public static final int MINIMUM_BET = 2;
+	public static final int MAXIMUM_BET = 80;
 
 	//
 	public static final int STATUS_DOT = 25000;
