@@ -24,6 +24,8 @@ public class Table {
 	private Dealer dealer;
 	private Player player;
 	private Report report;
+	private Card up;
+	private Card down;
 
 	//
 	public Table(Parameters parameters, Rules rules, Strategy strategy) {
@@ -61,20 +63,24 @@ public class Table {
 				dealer.reset();
 				player.placeBet(mimic);
 
-				Card up = dealCards(player.getWager());
+				dealCards(player.getWager());
 				if (!mimic && up.isAce()) {
 					player.insurance();
 				}
 
 				if (!dealer.getHand().isBlackjack()) {
 					player.play(up, shoe, mimic);
+					player.showCard(down);
 					if (!player.bustedOrBlackjack()) {
-						dealer.play(shoe);
+						while (!dealer.shouldStand()) {
+							Card card = shoe.drawCard();
+							dealer.drawCard(card);
+							player.showCard(card);
+						}
 					}
 				}
 
 				player.payoff(dealer.getHand().isBlackjack(), dealer.getHand().isBusted(), dealer.getHand().getHandTotal());
-				player.showCard(up);
 			}
 		}
 		System.out.println();
@@ -86,14 +92,15 @@ public class Table {
 		System.out.println("      End: table");
 	}
 
-	public Card dealCards(Hand hand) {
+	public void dealCards(Hand hand) {
 		player.drawCard(hand, shoe.drawCard());
-		Card up = shoe.drawCard();
+		up = shoe.drawCard();
 		dealer.drawCard(up);
-		player.drawCard(hand, shoe.drawCard());
-		dealer.drawCard(shoe.drawCard());
 		player.showCard(up);
-		return up;
+
+		player.drawCard(hand, shoe.drawCard());
+		down = shoe.drawCard();
+		dealer.drawCard(down);
 	}
 
 	public void show(Card card) {

@@ -12,6 +12,7 @@
 
 # Other
 bin/
+build/
 run
 
 # Package Files #
