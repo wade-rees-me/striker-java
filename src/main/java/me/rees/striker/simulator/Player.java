@@ -29,7 +29,7 @@ public class Player {
 		this.rules = rules;
 		this.strategy = strategy;
 		this.numberOfCards = numberOfCards;
-		this.wager = new Wager();
+		this.wager = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 		this.splits = new ArrayList<>();
 		this.report = new Report();
 		this.seenCards = new int[13]; // Keeps track of the cards the player has seen
@@ -84,7 +84,7 @@ public class Player {
 		}
 
 		if (wager.isPair() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
-			Wager split = new Wager();
+			Wager split = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 			wager.splitHand(split);
 			splits.add(split);
 
@@ -113,7 +113,7 @@ public class Player {
 	// Play the split hand
 	private void playSplit(Wager wager, Shoe shoe, Card up) {
 		if (wager.isPair() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
-			Wager split = new Wager();
+			Wager split = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 			splits.add(split);
 			wager.splitHand(split);
 			drawCard(wager, shoe.drawCard());

@@ -1,27 +1,29 @@
 package me.rees.striker.cards;
 
-import me.rees.striker.constants.Constants;
-
 public class Wager extends Hand {
 	//
+	private int minimumBet;
+	private int maximumBet;
 	private int amountBet;		 // The amount bet
 	private int amountWon;		 // The amount won
 	private int insuranceBet;	  // The insurance bet
 	private int insuranceWon;	  // The insurance winnings
 
 	// Constructor: Reset the wager to its initial state
-	public Wager() {
+	public Wager(int minimumBet, int maximumBet) {
 		reset();
+		this.minimumBet = minimumBet;
+		this.maximumBet = maximumBet;
 	}
 
 	// Reset the wager to initial state
 	@Override
 	public void reset() {
 		super.reset();
-		amountBet = 0;
-		amountWon = 0;
-		insuranceBet = 0;
-		insuranceWon = 0;
+		this.amountBet = 0;
+		this.amountWon = 0;
+		this.insuranceBet = 0;
+		this.insuranceWon = 0;
 	}
 
 	//
@@ -42,7 +44,7 @@ public class Wager extends Hand {
 
 	// Place the bet (ensure it's within the minimum and maximum range)
 	public void placeBet(int bet) {
-		amountBet = (Math.min(Constants.MAXIMUM_BET, Math.max(Constants.MINIMUM_BET, bet)) + 1) / 2 * 2;
+		amountBet = (Math.min(this.maximumBet, Math.max(this.minimumBet, bet)) + 1) / 2 * 2;
 	}
 
 	// Double the bet
