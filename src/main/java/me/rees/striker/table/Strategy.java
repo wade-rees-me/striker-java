@@ -71,8 +71,7 @@ public class Strategy extends Request {
 
 	//
     public int getBet(int[] seenCards) {
-        int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
-        return Math.min(Math.max(trueCount * 2, Constants.MINIMUM_BET), Constants.MAXIMUM_BET) / 2 * 2;
+        return getTrueCount(seenCards, getRunningCount(seenCards)) * TRUE_COUNT_BET;
     }
 
 	//
@@ -117,7 +116,7 @@ public class Strategy extends Request {
         for (int i = 2; i <= 11; i++) {
             unseen -= seenCards[i];
         }
-        return unseen > 0 ? (int) (runningCount / (unseen / 26.0)) : 0;
+        return unseen > 0 ? (int) ((float)runningCount / ((float)unseen / (float)TRUE_COUNT_MULTIPLIER)) : 0;
     }
 
 	//

@@ -70,7 +70,6 @@ public class Table {
 
 				if (!dealer.getHand().isBlackjack()) {
 					player.play(up, shoe, mimic);
-					player.showCard(down);
 					if (!player.bustedOrBlackjack()) {
 						while (!dealer.shouldStand()) {
 							Card card = shoe.drawCard();
@@ -80,6 +79,7 @@ public class Table {
 					}
 				}
 
+				player.showCard(down);
 				player.payoff(dealer.getHand().isBlackjack(), dealer.getHand().isBusted(), dealer.getHand().getHandTotal());
 			}
 		}

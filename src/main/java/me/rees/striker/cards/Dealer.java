@@ -21,15 +21,6 @@ public class Dealer {
 		hand.drawCard(card);
 	}
 
-/*
-	// Dealer's play logic
-	public void play(Shoe shoe) {
-		while (!shouldStand()) {
-			drawCard(shoe.drawCard());
-		}
-	}
-*/
-
 	// Determine if the dealer should stand
 	public boolean shouldStand() {
 		if (hitSoft17 && hand.isSoft17()) {
