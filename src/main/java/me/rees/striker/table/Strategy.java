@@ -19,11 +19,11 @@ public class Strategy extends Request {
     public List<Integer> Counts = new ArrayList<>();
     public List<Integer> Bets = new ArrayList<>();
     public String Insurance;
-    public Map<String, List<String>> SoftDouble = new HashMap<>();
-    public Map<String, List<String>> HardDouble = new HashMap<>();
-    public Map<String, List<String>> PairSplit = new HashMap<>();
-    public Map<String, List<String>> SoftStand = new HashMap<>();
-    public Map<String, List<String>> HardStand = new HashMap<>();
+    public Chart SoftDouble = new Chart("Soft Double");
+    public Chart HardDouble = new Chart("Hard Double");
+    public Chart PairSplit = new Chart("Pair Split");
+    public Chart SoftStand = new Chart("Soft Stand");
+    public Chart HardStand = new Chart("Hard Stand");
     private int numberOfCards;
 
 	//
@@ -33,6 +33,12 @@ public class Strategy extends Request {
         	try {
             	JsonArray tables = strategyFetchTable("http://localhost:57910/striker/v1/strategy");
             	fetchTable(tables, decks, strategy);
+
+    			SoftDouble.print();
+    			HardDouble.print();
+    			PairSplit.print();
+    			SoftStand.print();
+    			HardStand.print();
         	} catch (Exception e) {
             	System.err.println("Error fetching rules table: " + e.getMessage());
             	System.exit(1);
@@ -58,11 +64,11 @@ public class Strategy extends Request {
                 	Bets = toIntList(jsonPayload.get("bets").getAsJsonArray());
                 	Insurance = jsonPayload.get("insurance").getAsString();
 
-                	SoftDouble = toMapList(jsonPayload.get("soft-double").getAsJsonObject());
-                	HardDouble = toMapList(jsonPayload.get("hard-double").getAsJsonObject());
-                	PairSplit = toMapList(jsonPayload.get("pair-split").getAsJsonObject());
-                	SoftStand = toMapList(jsonPayload.get("soft-stand").getAsJsonObject());
-                	HardStand = toMapList(jsonPayload.get("hard-stand").getAsJsonObject());
+                	toMapList(jsonPayload.get("soft-double").getAsJsonObject(), SoftDouble);
+                	toMapList(jsonPayload.get("hard-double").getAsJsonObject(), HardDouble);
+                	toMapList(jsonPayload.get("pair-split").getAsJsonObject(), PairSplit);
+                	toMapList(jsonPayload.get("soft-stand").getAsJsonObject(), SoftStand);
+                	toMapList(jsonPayload.get("hard-stand").getAsJsonObject(), HardStand);
                 	return;
             	}
             }
@@ -71,7 +77,7 @@ public class Strategy extends Request {
 
 	//
     public int getBet(int[] seenCards) {
-        return getTrueCount(seenCards, getRunningCount(seenCards)) * TRUE_COUNT_BET;
+        return getTrueCount(seenCards, getRunningCount(seenCards)) * Constants.TRUE_COUNT_BET;
     }
 
 	//
@@ -84,21 +90,21 @@ public class Strategy extends Request {
     public boolean getDouble(int[] seenCards, int total, boolean soft, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
         String key = Integer.toString(total);
-        return processValue(soft ? SoftDouble.get(key).get(up.getOffset()) : HardDouble.get(key).get(up.getOffset()), trueCount, false);
+        return processValue(soft ? SoftDouble.getValue(key, up.getOffset()) : HardDouble.getValue(key, up.getOffset()), trueCount, false);
     }
 
 	//
     public boolean getSplit(int[] seenCards, Card pair, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
-        String key = Integer.toString(pair.getValue());
-        return processValue(PairSplit.get(key).get(up.getOffset()), trueCount, false);
+        String key = pair.getKey();
+        return processValue(PairSplit.getValue(key, up.getOffset()), trueCount, false);
     }
 
 	//
     public boolean getStand(int[] seenCards, int total, boolean soft, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
         String key = Integer.toString(total);
-        return processValue(soft ? SoftStand.get(key).get(up.getOffset()) : HardStand.get(key).get(up.getOffset()), trueCount, true);
+        return processValue(soft ? SoftStand.getValue(key, up.getOffset()) : HardStand.getValue(key, up.getOffset()), trueCount, true);
     }
 
 	//
@@ -116,7 +122,7 @@ public class Strategy extends Request {
         for (int i = 2; i <= 11; i++) {
             unseen -= seenCards[i];
         }
-        return unseen > 0 ? (int) ((float)runningCount / ((float)unseen / (float)TRUE_COUNT_MULTIPLIER)) : 0;
+        return unseen > 0 ? (int) ((float)runningCount / ((float)unseen / (float)Constants.TRUE_COUNT_MULTIPLIER)) : 0;
     }
 
 	//
@@ -149,21 +155,19 @@ public class Strategy extends Request {
     }
 
 	//
-	private Map<String, List<String>> toMapList(JsonObject jsonObject) {
-        Map<String, List<String>> map = new HashMap<>();
+	private void toMapList(JsonObject jsonObject, Chart chart) {
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            map.put(entry.getKey(), toStrList(entry.getValue().getAsJsonArray()));
+            toStrList(entry.getValue().getAsJsonArray(), entry.getKey(), chart);
         }
-        return map;
     }
 
 	//
-    private List<String> toStrList(JsonArray jsonArray) {
-        List<String> list = new ArrayList<>();
+    private void toStrList(JsonArray jsonArray, String key, Chart chart) {
+		int index = 0;
         for (JsonElement element : jsonArray) {
-            list.add(element.getAsString());
+			chart.insert(key, index, element.getAsString());
+			index++;
         }
-        return list;
     }
 }
 

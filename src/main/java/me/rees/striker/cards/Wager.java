@@ -27,11 +27,6 @@ public class Wager extends Hand {
 	}
 
 	//
-	public void setAmountBet(int bet) {
-		this.amountBet = bet;
-	}
-
-	//
 	public void setInsuranceBet(int bet) {
 		this.insuranceBet = bet;
 	}
@@ -45,6 +40,7 @@ public class Wager extends Hand {
 	// Place the bet (ensure it's within the minimum and maximum range)
 	public void placeBet(int bet) {
 		amountBet = (Math.min(this.maximumBet, Math.max(this.minimumBet, bet)) + 1) / 2 * 2;
+//System.out.println(amountBet);
 	}
 
 	// Double the bet
