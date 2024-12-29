@@ -10,6 +10,7 @@ public class Arguments {
 	private long numberOfHands = Constants.DEFAULT_NUMBER_OF_HANDS;
 	private boolean mimicFlag = false;
 	private boolean basicFlag = false;
+	private boolean neuralFlag = false;
 	private boolean linearFlag = false;
 	private boolean polynomialFlag = false;
 	private boolean highLowFlag = false;
@@ -26,6 +27,8 @@ public class Arguments {
 		argHandlers.put("--mimic", () -> mimicFlag = true);
 		argHandlers.put("-B", () -> basicFlag = true);
 		argHandlers.put("--basic", () -> basicFlag = true);
+		argHandlers.put("-N", () -> neuralFlag = true);
+		argHandlers.put("--neural", () -> neuralFlag = true);
 		argHandlers.put("-L", () -> linearFlag = true);
 		argHandlers.put("--linear", () -> linearFlag = true);
 		argHandlers.put("-P", () -> polynomialFlag = true);
@@ -76,6 +79,7 @@ public class Arguments {
 		if (mimicFlag) return "mimic";
 		if (polynomialFlag) return "polynomial";
 		if (linearFlag) return "linear";
+		if (neuralFlag) return "neural";
 		if (highLowFlag) return "high-low";
 		if (wongFlag) return "wong";
 		if (strikerFlag) return "striker";
@@ -115,6 +119,7 @@ public class Arguments {
 				"  -h, --number-of-hands <number of hands>  The number of hands to play in this simulation\n" +
 				"  -M, --mimic                              Use the mimic dealer player strategy\n" +
 				"  -B, --basic                              Use the basic player strategy\n" +
+				"  -N, --neural                             Use the neural player strategy\n" +
 				"  -L, --linear                             Use the liner regression player strategy\n" +
 				"  -P, --polynomial                         Use the polynomial regression player strategy\n" +
     			"  -H, --high-low                           Use the high low count player strategy\n" +
