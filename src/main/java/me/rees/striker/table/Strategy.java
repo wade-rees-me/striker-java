@@ -1,6 +1,7 @@
 package me.rees.striker.table;
 
 import me.rees.striker.cards.Card;
+import me.rees.striker.cards.Shoe;
 import me.rees.striker.constants.Constants;
 
 import com.google.gson.JsonArray;
@@ -16,9 +17,8 @@ import java.util.List;
 //
 public class Strategy extends Request {
     public String Playbook;
-    public List<Integer> Counts = new ArrayList<>();
-    public List<Integer> Bets = new ArrayList<>();
     public String Insurance;
+    public List<Integer> Counts = new ArrayList<>();
     public Chart SoftDouble = new Chart("Soft Double");
     public Chart HardDouble = new Chart("Hard Double");
     public Chart PairSplit = new Chart("Pair Split");
@@ -39,8 +39,9 @@ public class Strategy extends Request {
     			PairSplit.print();
     			SoftStand.print();
     			HardStand.print();
+    			printCounts();
         	} catch (Exception e) {
-            	System.err.println("Error fetching rules table: " + e.getMessage());
+            	System.err.println("Error fetching strategy table: " + e.getMessage());
             	System.exit(1);
         	}
         }
@@ -60,9 +61,10 @@ public class Strategy extends Request {
 					JsonObject jsonPayload = (new JsonParser()).parse(jsonObject.get("payload").getAsString()).getAsJsonObject();
 
                 	Playbook = jsonPayload.get("playbook").getAsString();
-                	Counts = toIntList(jsonPayload.get("counts").getAsJsonArray());
-                	Bets = toIntList(jsonPayload.get("bets").getAsJsonArray());
                 	Insurance = jsonPayload.get("insurance").getAsString();
+                	Counts = toIntList(jsonPayload.get("counts").getAsJsonArray());
+					//Counts.add(0, 0);
+					//Counts.add(0, 0);
 
                 	toMapList(jsonPayload.get("soft-double").getAsJsonObject(), SoftDouble);
                 	toMapList(jsonPayload.get("hard-double").getAsJsonObject(), HardDouble);
@@ -90,27 +92,27 @@ public class Strategy extends Request {
     public boolean getDouble(int[] seenCards, int total, boolean soft, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
         String key = Integer.toString(total);
-        return processValue(soft ? SoftDouble.getValue(key, up.getOffset()) : HardDouble.getValue(key, up.getOffset()), trueCount, false);
+        return processValue(soft ? SoftDouble.getValue(key, up.getValue()) : HardDouble.getValue(key, up.getValue()), trueCount, false);
     }
 
 	//
     public boolean getSplit(int[] seenCards, Card pair, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
         String key = pair.getKey();
-        return processValue(PairSplit.getValue(key, up.getOffset()), trueCount, false);
+        return processValue(PairSplit.getValue(key, up.getValue()), trueCount, false);
     }
 
 	//
     public boolean getStand(int[] seenCards, int total, boolean soft, Card up) {
         int trueCount = getTrueCount(seenCards, getRunningCount(seenCards));
         String key = Integer.toString(total);
-        return processValue(soft ? SoftStand.getValue(key, up.getOffset()) : HardStand.getValue(key, up.getOffset()), trueCount, true);
+        return processValue(soft ? SoftStand.getValue(key, up.getValue()) : HardStand.getValue(key, up.getValue()), trueCount, true);
     }
 
 	//
     private int getRunningCount(int[] seenCards) {
         int running = 0;
-        for (int i = 0; i <= 12; i++) {
+        for (int i = 2; i <= 11; i++) {
             running += Counts.get(i) * seenCards[i];
         }
         return running;
@@ -148,6 +150,8 @@ public class Strategy extends Request {
 	//
     private List<Integer> toIntList(JsonArray jsonArray) {
         List<Integer> list = new ArrayList<>();
+		list.add(0);
+		list.add(0);
 		for (JsonElement element : jsonArray) {
             list.add(element.getAsInt());
 		}
@@ -168,6 +172,18 @@ public class Strategy extends Request {
 			chart.insert(key, index, element.getAsString());
 			index++;
         }
+    }
+
+    //
+    public void printCounts() {
+        System.out.println("Counts");
+        System.out.println("--------------------2-----3-----4-----5-----6-----7-----8-----9-----X-----A---");
+		System.out.printf("     ");
+		for (int value : Counts) {
+			System.out.printf("%4d, ", value);
+		}
+		System.out.println();
+        System.out.println("------------------------------------------------------------------------------");
     }
 }
 

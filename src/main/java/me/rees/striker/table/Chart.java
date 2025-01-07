@@ -1,5 +1,7 @@
 package me.rees.striker.table;
 
+import me.rees.striker.cards.Shoe;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +16,7 @@ public class Chart {
 
         ChartRow() {
             this.key = "--";
-            this.values = new String[13];
+            this.values = new String[Shoe.MAXIMUM_CARD_VALUE + 1];
             Arrays.fill(this.values, "---");
         }
     }
@@ -43,7 +45,7 @@ public class Chart {
             index = nextRow++;
             rows.get(index).key = key.toUpperCase();
         }
-        rows.get(index).values[up] = value.toUpperCase();
+        rows.get(index).values[Shoe.MINIMUM_CARD_VALUE + up] = value.toUpperCase();
     }
 
     // Retrieve a value from the chart
@@ -59,7 +61,7 @@ public class Chart {
     // Print the entire chart
     public void print() {
         System.out.println(name);
-        System.out.println("--------2-----3-----4-----5-----6-----7-----8-----9-----T-----J-----Q-----K-----A---");
+        System.out.println("--------------------2-----3-----4-----5-----6-----7-----8-----9-----X-----A---");
         for (int i = 0; i < nextRow; i++) {
             ChartRow row = rows.get(i);
             System.out.printf("%2s : ", row.key);
@@ -68,7 +70,7 @@ public class Chart {
             }
             System.out.println();
         }
-        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------");
     }
 
     // Get the index of a row with the given key

@@ -32,7 +32,7 @@ public class Player {
 		this.wager = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 		this.splits = new ArrayList<>();
 		this.report = new Report();
-		this.seenCards = new int[13]; // Keeps track of the cards the player has seen
+		this.seenCards = new int[Shoe.MAXIMUM_CARD_VALUE + 1]; // Keeps track of the cards the player has seen
 	}
 
 	public Wager getWager() {
@@ -144,7 +144,7 @@ public class Player {
 
 	// Show the card
 	public void showCard(Card card) {
-		seenCards[card.getOffset()]++;
+		seenCards[card.getValue()]++;
 	}
 
 	// Check if player busted or has blackjack

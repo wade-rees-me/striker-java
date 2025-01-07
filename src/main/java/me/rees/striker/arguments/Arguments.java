@@ -82,7 +82,6 @@ public class Arguments {
 		if (neuralFlag) return "neural";
 		if (highLowFlag) return "high-low";
 		if (wongFlag) return "wong";
-		if (strikerFlag) return "striker";
 		return "basic";
 	}
 

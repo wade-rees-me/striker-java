@@ -6,15 +6,13 @@ public class Card {
 	private String rank; // Rank of the card (e.g., "ace")
 	private String key;
 	private int value;   // Value of the card for game calculations
-	private int offset;  // Index of the card in a suit
 
 	// Constructor
-	public Card(String suit, String rank, String key, int value, int offset) {
+	public Card(String suit, String rank, String key, int value) {
 		this.suit = suit;
 		this.rank = rank;
 		this.key = key;
 		this.value = value;
-		this.offset = offset;
 	}
 
 	//
@@ -43,13 +41,8 @@ public class Card {
 	}
 
 	//
-	public int getOffset() {
-		return offset;
-	}
-
-	//
 	public void display() {
-		System.out.println(rank + " of " + suit + " {" + value + ", " + offset + "}");
+		System.out.println(rank + " of " + suit + " {" + value + "}");
 	}
 }
 
