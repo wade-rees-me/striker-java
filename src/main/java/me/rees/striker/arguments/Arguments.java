@@ -15,7 +15,6 @@ public class Arguments {
 	private boolean polynomialFlag = false;
 	private boolean highLowFlag = false;
 	private boolean wongFlag = false;
-	private boolean strikerFlag = false;
 	private boolean singleDeckFlag = false;
 	private boolean doubleDeckFlag = false;
 	private boolean sixShoeFlag = false;
@@ -37,8 +36,6 @@ public class Arguments {
 		argHandlers.put("--high-low", () -> highLowFlag = true);
 		argHandlers.put("-W", () -> wongFlag = true);
 		argHandlers.put("--wong", () -> wongFlag = true);
-		argHandlers.put("-S", () -> strikerFlag = true);
-		argHandlers.put("--striker", () -> strikerFlag = true);
 		argHandlers.put("-1", () -> singleDeckFlag = true);
 		argHandlers.put("--single-deck", () -> singleDeckFlag = true);
 		argHandlers.put("-2", () -> doubleDeckFlag = true);
@@ -123,7 +120,6 @@ public class Arguments {
 				"  -P, --polynomial                         Use the polynomial regression player strategy\n" +
     			"  -H, --high-low                           Use the high low count player strategy\n" +
 				"  -W, --wong                               Use the Wong count player strategy\n" +
-				"  -S, --striker                            Use the Striker machine learning player strategy\n" +
 				"  -1, --single-deck                        Use a single deck of cards and rules\n" +
 				"  -2, --double-deck                        Use a double deck of cards and rules\n" +
 				"  -6, --six-shoe                           Use a six deck shoe of cards and rules");
