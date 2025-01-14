@@ -27,8 +27,8 @@ public class Shoe {
 	public static final String KING = "king";
 	public static final String ACE = "ace";
 
-    public static final int MINIMUM_CARD_VALUE = 2;
-    public static final int MAXIMUM_CARD_VALUE = 11;
+	public static final int MINIMUM_CARD_VALUE = 2;
+	public static final int MAXIMUM_CARD_VALUE = 11;
 
 	//
 	private List<Card> cards;				// Cards currently in the shoe

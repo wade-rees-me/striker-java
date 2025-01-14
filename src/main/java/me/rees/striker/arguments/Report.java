@@ -9,11 +9,11 @@ public class Report {
 	private long totalBet = 0;
 	private long totalWon = 0;
 	private long totalBlackjacks = 0;
-    private long totalDoubles = 0;
-    private long totalSplits = 0;
-    private long totalWins = 0;
-    private long totalLoses = 0;
-    private long totalPushes = 0;
+	private long totalDoubles = 0;
+	private long totalSplits = 0;
+	private long totalWins = 0;
+	private long totalLoses = 0;
+	private long totalPushes = 0;
 	private Instant start;
 	private Instant end;
 	private long duration = 0;
