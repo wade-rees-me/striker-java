@@ -27,6 +27,9 @@ public class Shoe {
 	public static final String KING = "king";
 	public static final String ACE = "ace";
 
+	public static final int MINIMUM_CARD_VALUE = 2;
+	public static final int MAXIMUM_CARD_VALUE = 11;
+
 	//
 	private List<Card> cards;				// Cards currently in the shoe
 	private String[] suits = {SPADES, DIAMONDS, CLUBS, HEARTS};
@@ -42,19 +45,19 @@ public class Shoe {
 		cards = new ArrayList<>();
 		for (int i = 0; i < numberOfDecks; i++) {
 			for (int j = 0; j < suits.length; j++) {
-				cards.add(new Card(suits[j], TWO, 2, 0));
-				cards.add(new Card(suits[j], THREE, 3, 1));
-				cards.add(new Card(suits[j], FOUR, 4, 2));
-				cards.add(new Card(suits[j], FIVE, 5, 3));
-				cards.add(new Card(suits[j], SIX, 6, 4));
-				cards.add(new Card(suits[j], SEVEN, 7, 5));
-				cards.add(new Card(suits[j], EIGHT, 8, 6));
-				cards.add(new Card(suits[j], NINE, 9, 7));
-				cards.add(new Card(suits[j], TEN, 10, 8));
-				cards.add(new Card(suits[j], JACK, 10, 9));
-				cards.add(new Card(suits[j], QUEEN, 10, 10));
-				cards.add(new Card(suits[j], KING, 10, 11));
-				cards.add(new Card(suits[j], ACE, 11, 12));
+				cards.add(new Card(suits[j], TWO, "2", 2));
+				cards.add(new Card(suits[j], THREE, "3", 3));
+				cards.add(new Card(suits[j], FOUR, "4", 4));
+				cards.add(new Card(suits[j], FIVE, "5", 5));
+				cards.add(new Card(suits[j], SIX, "6", 6));
+				cards.add(new Card(suits[j], SEVEN, "7", 7));
+				cards.add(new Card(suits[j], EIGHT, "8", 8));
+				cards.add(new Card(suits[j], NINE, "9", 9));
+				cards.add(new Card(suits[j], TEN, "X", 10));
+				cards.add(new Card(suits[j], JACK, "X", 10));
+				cards.add(new Card(suits[j], QUEEN, "X", 10));
+				cards.add(new Card(suits[j], KING, "X", 10));
+				cards.add(new Card(suits[j], ACE, "A", 11));
 			}
 		}
 

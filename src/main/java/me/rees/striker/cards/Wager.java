@@ -27,11 +27,6 @@ public class Wager extends Hand {
 	}
 
 	//
-	public void setAmountBet(int bet) {
-		this.amountBet = bet;
-	}
-
-	//
 	public void setInsuranceBet(int bet) {
 		this.insuranceBet = bet;
 	}
