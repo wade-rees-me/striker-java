@@ -3,7 +3,7 @@ package me.rees.striker.constants;
 public class Constants {
 	// General constants
 	public static final String STRIKER_WHO_AM_I = "striker-java";
-	public static final String STRIKER_VERSION = "v2.01.01";	 // Epoch.Major.Minor
+	public static final String STRIKER_VERSION = "v2.02.00";	 // Epoch.Major.Minor
 	public static final String TIME_LAYOUT = "yyyy-MM-dd HH:mm:ss Z";
 
 	// Simulation constants

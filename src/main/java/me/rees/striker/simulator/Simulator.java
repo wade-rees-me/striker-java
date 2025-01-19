@@ -60,7 +60,7 @@ public class Simulator {
 
 		DecimalFormat df = new DecimalFormat("00.00");
 		dbTable.setAverageTime(df.format((float) report.getDuration() * 1000000 / report.getTotalHands()) + " seconds");
-		dbTable.setAdvantage(String.format("%+04.3f %%", ((double) report.getTotalWon() / report.getTotalBet()) * 100));
+		dbTable.setAdvantage(String.format("%+04.3f %%", ((double)report.getTotalWon() / report.getTotalBet()) * 100));
 
 		// Print results
 		printReport(dbTable);
@@ -76,11 +76,17 @@ public class Simulator {
 		table.session(parameters.getStrategy().equals("mimic"));
 		System.out.println("	End: table session");
 
-		report.setTotalBet(report.getTotalBet() + table.getPlayer().getReport().getTotalBet());
-		report.setTotalWon(report.getTotalWon() + table.getPlayer().getReport().getTotalWon());
-		report.setTotalRounds(report.getTotalRounds() + table.getReport().getTotalRounds());
-		report.setTotalHands(report.getTotalHands() + table.getReport().getTotalHands());
-		report.setDuration(report.getDuration() + table.getReport().getDuration());
+		report.setTotalBet(table.getPlayer().getReport().getTotalBet());
+		report.setTotalWon(table.getPlayer().getReport().getTotalWon());
+		report.setTotalBlackjacks(table.getPlayer().getReport().getTotalBlackjacks());
+		report.setTotalDoubles(table.getPlayer().getReport().getTotalDoubles());
+		report.setTotalSplits(table.getPlayer().getReport().getTotalSplits());
+		report.setTotalWins(table.getPlayer().getReport().getTotalWins());
+		report.setTotalPushes(table.getPlayer().getReport().getTotalPushes());
+		report.setTotalLoses(table.getPlayer().getReport().getTotalLoses());
+		report.setTotalRounds(table.getReport().getTotalRounds());
+		report.setTotalHands(table.getReport().getTotalHands());
+		report.setDuration(table.getReport().getDuration());
 	}
 
 	// Insert simulation results into the database
@@ -141,6 +147,12 @@ public class Simulator {
 		System.out.println(String.format("    %-24s: %d", "Number of rounds", this.report.getTotalRounds()));
 		System.out.println(String.format("    %-24s: %d %+04.3f average bet per hand", "Total bet", this.report.getTotalBet(), (double) this.report.getTotalBet() / this.report.getTotalHands()));
 		System.out.println(String.format("    %-24s: %d %+04.3f average won per hand", "Total won", this.report.getTotalWon(), (double) this.report.getTotalWon() / this.report.getTotalHands()));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total blackjacks", this.report.getTotalBlackjacks(), (double) this.report.getTotalBlackjacks() / this.report.getTotalHands() * 100.0));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total doubles", this.report.getTotalDoubles(), (double) this.report.getTotalDoubles() / this.report.getTotalHands() * 100.0));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total splits", this.report.getTotalSplits(), (double) this.report.getTotalSplits() / this.report.getTotalHands() * 100.0));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total wins", this.report.getTotalWins(), (double) this.report.getTotalWins() / this.report.getTotalHands() * 100.0));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total pushes", this.report.getTotalPushes(), (double) this.report.getTotalPushes() / this.report.getTotalHands() * 100.0));
+		System.out.println(String.format("    %-24s: %d %+04.3f percent of total hands", "Total loses", this.report.getTotalLoses(), (double) this.report.getTotalLoses() / this.report.getTotalHands() * 100.0));
 		System.out.println(String.format("    %-24s: %d seconds", "Total time", this.report.getDuration()));
 		System.out.println(String.format("    %-24s: %s per 1,000,000 hands", "Average time", dbTable.getAverageTime()));
 		System.out.println(String.format("    %-24s: %s", "Player advantage", dbTable.getAdvantage()));

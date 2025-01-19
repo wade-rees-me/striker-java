@@ -32,7 +32,7 @@ public class Player {
 		this.wager = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 		this.splits = new ArrayList<>();
 		this.report = new Report();
-		this.seenCards = new int[13]; // Keeps track of the cards the player has seen
+		this.seenCards = new int[Shoe.MAXIMUM_CARD_VALUE + 1]; // Keeps track of the cards the player has seen
 	}
 
 	public Wager getWager() {
@@ -54,7 +54,7 @@ public class Player {
 	public void placeBet(boolean mimic) {
 		splits.clear();
 		wager.reset();
-		wager.setAmountBet(mimic ? Constants.MINIMUM_BET : strategy.getBet(seenCards));
+		wager.placeBet(mimic ? Constants.MINIMUM_BET : strategy.getBet(seenCards));
 	}
 
 	// Simulate an insurance bet
@@ -67,6 +67,7 @@ public class Player {
 	// Play the hand
 	public void play(Card up, Shoe shoe, boolean mimic) {
 		if (wager.isBlackjack()) {
+			report.addTotalBlackjacks();
 			return;
 		}
 
@@ -80,6 +81,7 @@ public class Player {
 		if (strategy.getDouble(seenCards, wager.getHandTotal(), wager.isSoft(), up)) {
 			wager.doubleBet();
 			drawCard(wager, shoe.drawCard());
+			report.addTotalDoubles();
 			return;
 		}
 
@@ -87,6 +89,7 @@ public class Player {
 			Wager split = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 			wager.splitHand(split);
 			splits.add(split);
+			report.addTotalSplits();
 
 			if (wager.isPairOfAces()) {
 				drawCard(wager, shoe.drawCard());
@@ -116,6 +119,7 @@ public class Player {
 			Wager split = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
 			splits.add(split);
 			wager.splitHand(split);
+			report.addTotalSplits();
 			drawCard(wager, shoe.drawCard());
 			playSplit(wager, shoe, up);
 			drawCard(split, shoe.drawCard());
@@ -140,7 +144,7 @@ public class Player {
 
 	// Show the card
 	public void showCard(Card card) {
-		seenCards[card.getOffset()]++;
+		seenCards[card.getValue()]++;
 	}
 
 	// Check if player busted or has blackjack
@@ -162,6 +166,7 @@ public class Player {
 		if (splits.isEmpty()) {
 			payoffHand(wager, dealerBlackjack, dealerBusted, dealerTotal);
 		} else {
+			payoffSplit(wager, dealerBusted, dealerTotal);
 			for (Wager split : splits) {
 				payoffSplit(split, dealerBusted, dealerTotal);
 			}
@@ -174,8 +179,10 @@ public class Player {
 			wager.wonInsurance();
 			if (wager.isBlackjack()) {
 				wager.push();
+				report.addTotalPushes();
 			} else {
 				wager.lost();
+				report.addTotalLoses();
 			}
 		} else {
 			wager.lostInsurance();
@@ -183,33 +190,41 @@ public class Player {
 				wager.wonBlackjack(rules.getBlackjackPays(), rules.getBlackjackBets());
 			} else if (wager.isBusted()) {
 				wager.lost();
+				report.addTotalLoses();
 			} else if (dealerBusted || wager.getHandTotal() > dealerTotal) {
 				wager.won();
+				report.addTotalWins();
 			} else if (dealerTotal > wager.getHandTotal()) {
 				wager.lost();
+				report.addTotalLoses();
 			} else {
 				wager.push();
+				report.addTotalPushes();
 			}
 		}
 
-		report.setTotalBet(report.getTotalBet() + wager.getAmountBet() + wager.getInsuranceBet());
-		report.setTotalWon(report.getTotalWon() + wager.getAmountWon() + wager.getInsuranceWon());
+		report.addTotalBet(wager.getAmountBet() + wager.getInsuranceBet());
+		report.addTotalWon(wager.getAmountWon() + wager.getInsuranceWon());
 	}
 
 	// Payoff for split hands
 	private void payoffSplit(Wager wager, boolean dealerBusted, int dealerTotal) {
 		if (wager.isBusted()) {
 			wager.lost();
+			report.addTotalLoses();
 		} else if (dealerBusted || wager.getHandTotal() > dealerTotal) {
 			wager.won();
+			report.addTotalWins();
 		} else if (dealerTotal > wager.getHandTotal()) {
 			wager.lost();
+			report.addTotalLoses();
 		} else {
 			wager.push();
+				report.addTotalPushes();
 		}
 
-		report.setTotalWon(report.getTotalWon() + wager.getAmountWon());
-		report.setTotalBet(report.getTotalBet() + wager.getAmountBet());
+		report.addTotalBet(wager.getAmountBet());
+		report.addTotalWon(wager.getAmountWon());
 	}
 
 	// Mimic strategy stand
