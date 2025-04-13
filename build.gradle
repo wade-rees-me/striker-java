@@ -3,6 +3,7 @@ plugins {
 	id 'java'													// Basic Java plugin
 	id 'application'											// Plugin for running Java applications
 	id 'com.github.johnrengelman.shadow' version '7.0.0'		// Apply Shadow plugin for creating fat JARs (self-contained)
+	id 'org.graalvm.buildtools.native' version '0.10.5'
 }
 
 // Project details
@@ -69,6 +70,14 @@ task copyJar(type: Copy) {
 	doLast {
 		println 'end copy'
 	}
+}
+
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add('-H:EnableURLProtocols=http')
+        }
+    }
 }
 
 // Ensure the copyJar task runs after the build task finishes

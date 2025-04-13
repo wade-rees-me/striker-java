@@ -1,202 +1,367 @@
 package me.rees.striker.arguments;
 
+import com.google.gson.JsonObject;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import me.rees.striker.constants.Constants;
 
+//
 public class Report {
-	//
-	private long totalRounds = 0;
-	private long totalHands = 0;
-	private long totalBet = 0;
-	private long totalWon = 0;
-	private long totalBlackjacks = 0;
-	private long totalDoubles = 0;
-	private long totalSplits = 0;
-	private long totalWins = 0;
-	private long totalLoses = 0;
-	private long totalPushes = 0;
-	private Instant start;
-	private Instant end;
-	private long duration = 0;
+  private String name = "";
+  private String version = "";
+  private String simulator = "";
+  private String playbook = "";
+  private String strategy = "";
+  private String decks = "";
+  private String epoch = "";
 
-	// Constructor
-	public Report() {
-		this.start = Instant.now();
-		this.end = Instant.now();
-	}
+  //
+  private long totalRounds = 0;
+  private long totalHands = 0;
+  private long totalBet = 0;
+  private long totalWon = 0;
+  private long totalBlackjacks = 0;
+  private long totalDoubles = 0;
+  private long totalSplits = 0;
+  private long totalWins = 0;
+  private long totalLoses = 0;
+  private long totalPushes = 0;
+  private long totalThreads = 1;
+  private long start = 0;
+  private long end = 0;
+  private long duration = 0;
+  private double advantage = 0.0;
+  private double perBillion = 0.0;
 
-	// Getters and Setters for each field
-	public long getTotalRounds() {
-		return totalRounds;
-	}
+  //
+  public void init(Parameters parameters) {
+    Instant now = Instant.now();
+    this.start = now.getEpochSecond();
 
-	//
-	public void setTotalRounds(long totalRounds) {
-		this.totalRounds = totalRounds;
-	}
+    this.name = new String(parameters.getName());
+    this.version = new String(Constants.STRIKER_VERSION);
+    this.simulator = new String(parameters.getSimulator());
+    this.playbook = new String(parameters.getPlaybook());
+    this.strategy = new String(parameters.getStrategy());
+    this.decks = new String(parameters.getDecks());
+    this.epoch = new String(parameters.getEpoch());
+  }
 
-	//
-	public long getTotalHands() {
-		return totalHands;
-	}
+  //
+  public void merge(Report b) {
+    totalRounds += b.totalRounds;
+    totalHands += b.totalHands;
+    totalBet += b.totalBet;
+    totalWon += b.totalWon;
+    totalBlackjacks += b.totalBlackjacks;
+    totalDoubles += b.totalDoubles;
+    totalSplits += b.totalSplits;
+    totalWins += b.totalWins;
+    totalLoses += b.totalLoses;
+    totalPushes += b.totalPushes;
+  }
 
-	//
-	public void setTotalHands(long totalHands) {
-		this.totalHands = totalHands;
-	}
+  //
+  public void finish() {
+    Instant now = Instant.now();
+    this.end = now.getEpochSecond();
+    this.duration = this.end - this.start;
+    this.advantage = ((double) totalWon / totalBet) * 100;
+    this.perBillion = ((double) duration * (double) Constants.BILLION / (double) totalHands);
+  }
 
-	//
-	public long getTotalBet() {
-		return totalBet;
-	}
+  // Print results after simulation
+  public void print() throws IOException {
+    System.out.println(String.format("    %-26s: %,17d", "Number of hands", this.totalHands));
+    System.out.println(String.format("    %-26s: %,17d", "Number of rounds", this.totalRounds));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f average bet per hand",
+            "Total bet", this.totalBet, (double) this.totalBet / this.totalHands));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f average won per hand",
+            "Total won", this.totalWon, (double) this.totalWon / this.totalHands));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total blackjacks",
+            this.totalBlackjacks,
+            (double) this.totalBlackjacks / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total doubles",
+            this.totalDoubles,
+            (double) this.totalDoubles / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total splits", this.totalSplits, (double) this.totalSplits / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total wins", this.totalWins, (double) this.totalWins / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total pushes", this.totalPushes, (double) this.totalPushes / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total loses", this.totalLoses, (double) this.totalLoses / this.totalHands * 100.0));
+    System.out.println(String.format("    %-26s: %,17d seconds", "Total time", this.getDuration()));
+    System.out.println(
+        String.format("    %-26s: %,17d threads", "Total threads", this.totalThreads));
+    System.out.println(
+        String.format(
+            "    %-26s: %17.0f seconds per %,d hands",
+            "Average time", this.perBillion, Constants.BILLION));
+    System.out.println(
+        String.format("    %-26s: %17s %,+08.3f %%", "Player advantage", "", this.advantage));
+  }
 
-	//
-	public void addTotalBet(long totalBet) {
-		this.totalBet += totalBet;
-	}
+  // Insert simulation results into the database
+  public void insert() {
+    if (this.totalHands < Constants.NUMBER_OF_HANDS_DATABASE) {
+      System.out.println(
+          String.format(
+              "    Error: Not enough hands played (%d). Minimum required is %d",
+              this.totalHands, Constants.NUMBER_OF_HANDS_DATABASE));
+      return;
+    }
+    try {
+      URL url =
+          new URL(
+              String.format(
+                  "http://%s/%s/%s/%s", Constants.getSimulationsUrl(), simulator, playbook, name));
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-	//
-	public void setTotalBet(long totalBet) {
-		this.totalBet = totalBet;
-	}
+      // Set request method and headers
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Content-Type", "application/json");
+      connection.setDoOutput(true);
 
-	//
-	public long getTotalWon() {
-		return totalWon;
-	}
+      // Send the request
+      JsonObject json = toJsonObject();
+      try (OutputStream os = connection.getOutputStream()) {
+        byte[] input = json.toString().getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+      }
 
-	//
-	public void addTotalWon(long totalWon) {
-		this.totalWon += totalWon;
-	}
+      // Get the response
+      int responseCode = connection.getResponseCode();
+      if (responseCode != HttpURLConnection.HTTP_OK) {
+        System.out.println(
+            String.format("    HTTP request failed with response code: " + responseCode));
+        return;
+      }
+      System.out.println("    Insert successful");
 
-	//
-	public void setTotalWon(long totalWon) {
-		this.totalWon = totalWon;
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println(String.format("    Failed to insert simulation data"));
+    }
+  }
 
-	//
-	public long getTotalBlackjacks() {
-		return totalBlackjacks;
-	}
+  public JsonObject toJsonObject() {
+    JsonObject json = new JsonObject();
 
-	//
-	public void addTotalBlackjacks() {
-		this.totalBlackjacks++;
-	}
+    json.addProperty("guid", name);
+    json.addProperty("version", version);
+    json.addProperty("simulator", simulator);
+    json.addProperty("threads", totalThreads);
+    json.addProperty("playbook", playbook);
+    json.addProperty("decks", decks);
+    json.addProperty("playbook", playbook);
+    json.addProperty("decks", decks);
+    json.addProperty("strategy", strategy);
+    json.addProperty("rounds", totalRounds);
+    json.addProperty("hands", totalHands);
+    json.addProperty("total_bet", totalBet);
+    json.addProperty("total_won", totalWon);
+    json.addProperty("total_blackjacks", totalBlackjacks);
+    json.addProperty("total_doubles", totalDoubles);
+    json.addProperty("total_splits", totalSplits);
+    json.addProperty("total_wins", totalWins);
+    json.addProperty("total_loses", totalLoses);
+    json.addProperty("total_pushes", totalPushes);
+    json.addProperty("advantage", advantage);
+    json.addProperty("epoch", epoch);
+    json.addProperty("start", start);
+    json.addProperty("end", end);
+    json.addProperty("duration", duration);
+    json.addProperty("per_billion", perBillion);
 
-	//
-	public void setTotalBlackjacks(long totalBlackjacks) {
-		this.totalBlackjacks = totalBlackjacks;
-	}
+    return json;
+  }
 
-	//
-	public long getTotalDoubles() {
-		return totalDoubles;
-	}
+  // Getters and Setters for each field
+  public long getTotalRounds() {
+    return totalRounds;
+  }
 
-	//
-	public void addTotalDoubles() {
-		this.totalDoubles++;
-	}
+  //
+  public void setTotalRounds(long totalRounds) {
+    this.totalRounds = totalRounds;
+  }
 
-	//
-	public void setTotalDoubles(long totalDoubles) {
-		this.totalDoubles = totalDoubles;
-	}
+  //
+  public long getTotalHands() {
+    return totalHands;
+  }
 
-	//
-	public long getTotalSplits() {
-		return totalSplits;
-	}
+  //
+  public void setTotalHands(long totalHands) {
+    this.totalHands = totalHands;
+  }
 
-	//
-	public void addTotalSplits() {
-		this.totalSplits++;
-	}
+  //
+  public long getTotalBet() {
+    return totalBet;
+  }
 
-	//
-	public void setTotalSplits(long totalSplits) {
-		this.totalSplits = totalSplits;
-	}
+  //
+  public void addTotalBet(long totalBet) {
+    this.totalBet += totalBet;
+  }
 
-	//
-	public long getTotalWins() {
-		return totalWins;
-	}
+  //
+  public void setTotalBet(long totalBet) {
+    this.totalBet = totalBet;
+  }
 
-	//
-	public void addTotalWins() {
-		this.totalWins++;
-	}
+  //
+  public long getTotalWon() {
+    return totalWon;
+  }
 
-	//
-	public void setTotalWins(long totalWins) {
-		this.totalWins = totalWins;
-	}
+  //
+  public void addTotalWon(long totalWon) {
+    this.totalWon += totalWon;
+  }
 
-	//
-	public long getTotalPushes() {
-		return totalPushes;
-	}
+  //
+  public void setTotalWon(long totalWon) {
+    this.totalWon = totalWon;
+  }
 
-	//
-	public void addTotalPushes() {
-		this.totalPushes++;
-	}
+  //
+  public long getTotalBlackjacks() {
+    return totalBlackjacks;
+  }
 
-	//
-	public void setTotalPushes(long totalPushes) {
-		this.totalPushes = totalPushes;
-	}
+  //
+  public void addTotalBlackjacks() {
+    this.totalBlackjacks++;
+  }
 
-	//
-	public long getTotalLoses() {
-		return totalLoses;
-	}
+  //
+  public void setTotalBlackjacks(long totalBlackjacks) {
+    this.totalBlackjacks = totalBlackjacks;
+  }
 
-	//
-	public void addTotalLoses() {
-		this.totalLoses++;
-	}
+  //
+  public long getTotalDoubles() {
+    return totalDoubles;
+  }
 
-	//
-	public void setTotalLoses(long totalLoses) {
-		this.totalLoses = totalLoses;
-	}
+  //
+  public void addTotalDoubles() {
+    this.totalDoubles++;
+  }
 
-	//
-	public Instant getStart() {
-		return start;
-	}
+  //
+  public void setTotalDoubles(long totalDoubles) {
+    this.totalDoubles = totalDoubles;
+  }
 
-	//
-	public void setStart(Instant start) {
-		this.start = start;
-	}
+  //
+  public long getTotalSplits() {
+    return totalSplits;
+  }
 
-	//
-	public Instant getEnd() {
-		return end;
-	}
+  //
+  public void addTotalSplits() {
+    this.totalSplits++;
+  }
 
-	//
-	public void setEnd(Instant end) {
-		this.end = end;
-	}
+  //
+  public void setTotalSplits(long totalSplits) {
+    this.totalSplits = totalSplits;
+  }
 
-	//
-	public long getDuration() {
-		return duration;
-	}
+  //
+  public long getTotalWins() {
+    return totalWins;
+  }
 
-	//
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
+  //
+  public void addTotalWins() {
+    this.totalWins++;
+  }
 
-	// Example: Calculate the duration between start and end time
-	public void calculateDuration() {
-		this.duration = java.time.Duration.between(start, end).toSeconds();
-	}
+  //
+  public void setTotalWins(long totalWins) {
+    this.totalWins = totalWins;
+  }
+
+  //
+  public long getTotalPushes() {
+    return totalPushes;
+  }
+
+  //
+  public void addTotalPushes() {
+    this.totalPushes++;
+  }
+
+  //
+  public void setTotalPushes(long totalPushes) {
+    this.totalPushes = totalPushes;
+  }
+
+  //
+  public long getTotalLoses() {
+    return totalLoses;
+  }
+
+  //
+  public void addTotalLoses() {
+    this.totalLoses++;
+  }
+
+  //
+  public void setTotalLoses(long totalLoses) {
+    this.totalLoses = totalLoses;
+  }
+
+  //
+  public long getStart() {
+    return start;
+  }
+
+  //
+  public void setStart(long start) {
+    this.start = start;
+  }
+
+  //
+  public long getEnd() {
+    return end;
+  }
+
+  //
+  public void setEnd(long end) {
+    this.end = end;
+  }
+
+  //
+  public long getDuration() {
+    return duration;
+  }
 }
-
