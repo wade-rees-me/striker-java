@@ -18,6 +18,7 @@ public class Constants {
   public static final long MAX_STRING_SIZE = 512;
   public static final long MAX_BUFFER_SIZE = 8192;
   public static final long MAX_MEMORY_SIZE = 536870912;
+  public static final long STATUS_ROUNDS = 1000000;
 
   // Simulation constants
   public static final long MILLION = 1000000L;

@@ -82,7 +82,7 @@ public class Parameters {
     System.out.println(String.format("    %-26s: %s", "Decks", decks));
     System.out.println(String.format("    %-26s: %s", "Strategy", strategy));
     System.out.println(String.format("    %-26s: %,17d", "Number of hands", numberOfHands));
-    System.out.println(String.format("    %-26s: %,17d", "Thread's share of hands", numberOfHands));
+    System.out.println(String.format("    %-26s: %,17d", "Thread share of hands", numberOfHands));
     System.out.println(String.format("    %-26s: %s", "Epoch", epoch));
   }
 
