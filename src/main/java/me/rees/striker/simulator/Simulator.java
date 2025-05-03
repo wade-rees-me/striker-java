@@ -39,6 +39,7 @@ public class Simulator {
     report.setTotalBlackjacks(table.getPlayer().getReport().getTotalBlackjacks());
     report.setTotalDoubles(table.getPlayer().getReport().getTotalDoubles());
     report.setTotalSplits(table.getPlayer().getReport().getTotalSplits());
+    report.setTotalSplitsAce(table.getPlayer().getReport().getTotalSplitsAce());
     report.setTotalWins(table.getPlayer().getReport().getTotalWins());
     report.setTotalPushes(table.getPlayer().getReport().getTotalPushes());
     report.setTotalLoses(table.getPlayer().getReport().getTotalLoses());

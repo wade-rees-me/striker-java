@@ -45,7 +45,7 @@ public class Hand {
 
   // Check if the hand is a pair of aces
   public boolean isPairOfAces() {
-    return isPair() && cards.get(0).getRank().equals("ace");
+    return isPair() && cards.get(0).isAce();
   }
 
   // Check if the hand is busted

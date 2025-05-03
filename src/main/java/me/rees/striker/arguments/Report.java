@@ -27,6 +27,7 @@ public class Report {
   private long totalBlackjacks = 0;
   private long totalDoubles = 0;
   private long totalSplits = 0;
+  private long totalSplitsAce = 0;
   private long totalWins = 0;
   private long totalLoses = 0;
   private long totalPushes = 0;
@@ -60,6 +61,7 @@ public class Report {
     totalBlackjacks += b.totalBlackjacks;
     totalDoubles += b.totalDoubles;
     totalSplits += b.totalSplits;
+    totalSplitsAce += b.totalSplitsAce;
     totalWins += b.totalWins;
     totalLoses += b.totalLoses;
     totalPushes += b.totalPushes;
@@ -102,6 +104,10 @@ public class Report {
         String.format(
             "    %-26s: %,17d %+08.3f %% of total hands",
             "Total splits", this.totalSplits, (double) this.totalSplits / this.totalHands * 100.0));
+    System.out.println(
+        String.format(
+            "    %-26s: %,17d %+08.3f %% of total hands",
+            "Total splits - Aces", this.totalSplitsAce, (double) this.totalSplitsAce / this.totalHands * 100.0));
     System.out.println(
         String.format(
             "    %-26s: %,17d %+08.3f %% of total hands",
@@ -187,6 +193,7 @@ public class Report {
     json.addProperty("total_blackjacks", totalBlackjacks);
     json.addProperty("total_doubles", totalDoubles);
     json.addProperty("total_splits", totalSplits);
+    json.addProperty("total_splits_ace", totalSplitsAce);
     json.addProperty("total_wins", totalWins);
     json.addProperty("total_loses", totalLoses);
     json.addProperty("total_pushes", totalPushes);
@@ -293,6 +300,21 @@ public class Report {
   //
   public void setTotalSplits(long totalSplits) {
     this.totalSplits = totalSplits;
+  }
+
+  //
+  public long getTotalSplitsAce() {
+    return totalSplitsAce;
+  }
+
+  //
+  public void addTotalSplitsAce() {
+    this.totalSplitsAce++;
+  }
+
+  //
+  public void setTotalSplitsAce(long totalSplitsAce) {
+    this.totalSplitsAce = totalSplitsAce;
   }
 
   //

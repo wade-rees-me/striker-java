@@ -84,16 +84,19 @@ public class Player {
 
     if (wager.isPair() && strategy.getSplit(seenCards, wager.getCardPair(), up)) {
       Wager split = new Wager(Constants.MINIMUM_BET, Constants.MAXIMUM_BET);
-      wager.splitHand(split);
-      splits.add(split);
       report.addTotalSplits();
 
       if (wager.isPairOfAces()) {
+        report.addTotalSplitsAce();
+        wager.splitHand(split);
+        splits.add(split);
         drawCard(wager, shoe.drawCard());
         drawCard(split, shoe.drawCard());
         return;
       }
 
+      wager.splitHand(split);
+      splits.add(split);
       drawCard(wager, shoe.drawCard());
       playSplit(wager, shoe, up);
       drawCard(split, shoe.drawCard());
