@@ -30,7 +30,7 @@ public class Constants {
 
   // Betting constants
   public static final int MINIMUM_BET = 2;
-  public static final int MAXIMUM_BET = 80;
+  public static final int MAXIMUM_BET = 20;
   public static final int TRUE_COUNT_BET = 2;
   public static final int TRUE_COUNT_MULTIPLIER = 26;
 
