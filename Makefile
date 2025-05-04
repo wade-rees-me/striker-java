@@ -5,7 +5,7 @@ GRADLE = ./gradlew
 NATIVE = nativeCompile
 
 # Output binary
-TARGET = bin/strikerJava
+TARGET = bin/striker-java
 
 # Home directory for Striker
 STRIKER = ${HOME}/Striker

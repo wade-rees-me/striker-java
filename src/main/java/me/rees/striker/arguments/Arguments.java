@@ -119,7 +119,7 @@ public class Arguments {
   // Print the help message for the program
   private void printHelpMessage() {
     System.out.println(
-        "Usage: strikerJava [options]\n"
+        "Usage: striker-java [options]\n"
             + "Options:\n"
             + "  --help                                   Show this help message\n"
             + "  --version                                Display the program version\n"

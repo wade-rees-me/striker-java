@@ -133,6 +133,10 @@ public class Report {
 
   // Insert simulation results into the database
   public void insert() {
+	if (!Constants.isMyComputer()) {
+      System.out.println("    This code is restricted to running only on my computer.");
+      return;
+    }
     if (this.totalHands < Constants.NUMBER_OF_HANDS_DATABASE) {
       System.out.println(
           String.format(

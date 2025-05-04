@@ -1,12 +1,14 @@
 package me.rees.striker.constants;
 
 import java.io.*;
+import java.net.*;
 
 public class Constants {
   // General constants
   public static final String STRIKER_WHO_AM_I = "striker-java";
   public static final String STRIKER_VERSION = "v3.00.00";
   public static final String TIME_LAYOUT = "yyyy-MM-dd HH:mm:ss Z";
+  public static final String MY_HOSTNAME = "Striker";
 
   //
   public static final long NUMBER_OF_CARDS_IN_DECK = 52;
@@ -33,6 +35,18 @@ public class Constants {
   public static final int MAXIMUM_BET = 20;
   public static final int TRUE_COUNT_BET = 2;
   public static final int TRUE_COUNT_MULTIPLIER = 26;
+
+  // Get hostname and check if it matches
+  public static boolean isMyComputer() {
+      try {
+          String hostname = InetAddress.getLocalHost().getHostName();
+          String myHostname = MY_HOSTNAME;
+          return myHostname.equals(hostname);
+      } catch (Exception e) {
+          System.out.println("Error getting hostname: " + e.getMessage());
+          return false;
+      }
+  }
 
   // Methods to get environment variables
   public static String getRulesUrl() {
