@@ -20,7 +20,7 @@ This command uses Gradle to compile the Java project and build the required JAR 
 make run STRATEGY=mimic DECKS=single-deck HANDS=500000000 THREADS=24
 ```
 
-This command runs the simulator with the given strategy, deck type, number of hands, and number of threads. Output is logged to:
+This command runs the simulator with the given strategy, deck type and  number of hands. Output is logged to:
 
 ```
 ${HOME}/Striker/Simulations/YYYY/MM/DD/striker-java-HHMMSS.log
