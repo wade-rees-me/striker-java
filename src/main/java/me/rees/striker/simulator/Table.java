@@ -1,21 +1,14 @@
 package me.rees.striker.simulator;
 
-import me.rees.striker.table.Rules;
-import me.rees.striker.table.Strategy;
 import me.rees.striker.arguments.Parameters;
-import me.rees.striker.arguments.Arguments;
 import me.rees.striker.arguments.Report;
-import me.rees.striker.simulator.Simulator;
-import me.rees.striker.constants.Constants;
-import me.rees.striker.cards.Hand;
-import me.rees.striker.cards.Shoe;
 import me.rees.striker.cards.Card;
 import me.rees.striker.cards.Dealer;
-
-import java.util.TimeZone;
-import java.util.Date;
-import java.time.Instant;
-import java.text.SimpleDateFormat;
+import me.rees.striker.cards.Hand;
+import me.rees.striker.cards.Shoe;
+import me.rees.striker.table.Rules;
+import me.rees.striker.table.Strategy;
+import me.rees.striker.constants.Constants;
 
 public class Table {
 	//
@@ -48,10 +41,6 @@ public class Table {
 
 	//
 	public void session(boolean mimic) {
-		System.out.println(String.format("      Start: table, playing %s hands", parameters.getNumberOfHands()));
-
-		report.setStart(Instant.now());
-
 		while (report.getTotalHands() < parameters.getNumberOfHands()) {
 			status(report.getTotalRounds(), report.getTotalHands());
 			shoe.shuffle();
@@ -80,16 +69,11 @@ public class Table {
 				}
 
 				player.showCard(down);
-				player.payoff(dealer.getHand().isBlackjack(), dealer.getHand().isBusted(), dealer.getHand().getHandTotal());
+				player.payoff(dealer.getHand().isBlackjack(),
+				    dealer.getHand().isBusted(), dealer.getHand().getHandTotal());
 			}
 		}
-		System.out.println();
-
-		report.setEnd(Instant.now());
-		long duration = report.getEnd().getEpochSecond() - report.getStart().getEpochSecond();
-		report.setDuration(duration);
-
-		System.out.println("      End: table");
+		System.out.print("\r");
 	}
 
 	public void dealCards(Hand hand) {
@@ -108,16 +92,9 @@ public class Table {
 	}
 
 	private void status(long round, long hand) {
-		if (round == 0) {
-			System.out.print("        ");
-		}
-		if ((round + 1) % Constants.STATUS_DOT == 0) {
-			System.out.print(".");
-		}
-		if ((round + 1) % Constants.STATUS_LINE == 0) {
-			System.out.println(String.format(" : %d (rounds), %d (hands)", (round + 1), hand));
-			System.out.print("        ");
+		if (round % Constants.STATUS_ROUNDS == 0) {
+			System.out.print(String.format("\r    Rounds: [%,17d] Hands: [%,17d] Simulating...", round, hand));
+			System.out.flush();
 		}
 	}
 }
-
