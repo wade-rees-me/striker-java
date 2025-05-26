@@ -1,46 +1,100 @@
 package me.rees.striker.constants;
 
+import java.io.*;
+import java.net.*;
+
 public class Constants {
-	// General constants
-	public static final String STRIKER_WHO_AM_I = "striker-java";
-	public static final String STRIKER_VERSION = "v2.02.00";	 // Epoch.Major.Minor
-	public static final String TIME_LAYOUT = "yyyy-MM-dd HH:mm:ss Z";
+  // General constants
+  public static final String STRIKER_WHO_AM_I = "striker-java";
+  public static final String STRIKER_VERSION = "v3.00.00";
+  public static final String TIME_LAYOUT = "yyyy-MM-dd HH:mm:ss Z";
+  public static final String MY_HOSTNAME = "Striker";
 
-	// Simulation constants
-	public static final long MAXIMUM_NUMBER_OF_HANDS = 250000000000L;
-	public static final long MINIMUM_NUMBER_OF_HANDS = 100;
-	public static final long DEFAULT_NUMBER_OF_HANDS = 25000000;
-	public static final long DATABASE_NUMBER_OF_HANDS = 250000000;
+  //
+  public static final long NUMBER_OF_CARDS_IN_DECK = 52;
+  public static final long NUMBER_OF_CORES_PHYSICAL = 24;
+  public static final long NUMBER_OF_CORES_LOGICAL = 32;
+  public static final long NUMBER_OF_CORES_DEFAULT = 1;
 
-	// Betting constants
-	public static final int MINIMUM_BET = 2;
-	public static final int MAXIMUM_BET = 80;
-	public static final int TRUE_COUNT_BET = 2;
-	public static final int TRUE_COUNT_MULTIPLIER = 26;
+  // Define the maximum size string fields
+  public static final long MAX_STRING_SIZE = 512;
+  public static final long MAX_BUFFER_SIZE = 8192;
+  public static final long MAX_MEMORY_SIZE = 536870912;
+  public static final long STATUS_ROUNDS = 1000000;
 
-	//
-	public static final int STATUS_DOT = 25000;
-	public static final int STATUS_LINE = 1000000;
+  // Simulation constants
+  public static final long MILLION = 1000000L;
+  public static final long BILLION = MILLION * 1000L;
+  public static final long NUMBER_OF_HANDS_MAXIMUM = BILLION * 10L;
+  public static final long NUMBER_OF_HANDS_MINIMUM = 1000L;
+  public static final long NUMBER_OF_HANDS_DEFAULT = MILLION * 100L;
+  public static final long NUMBER_OF_HANDS_DATABASE = MILLION * 100L;
 
-	// Methods to get environment variables
-	public static String getRulesUrl() {
-		return System.getenv("STRIKER_URL_RULES");
-	}
+  // Betting constants
+  public static final int MINIMUM_BET = 2;
+  public static final int MAXIMUM_BET = 20;
+  public static final int TRUE_COUNT_BET = 2;
+  public static final int TRUE_COUNT_MULTIPLIER = 26;
 
-	public static String getStrategyUrl() {
-		return System.getenv("STRIKER_URL_ACE");
-	}
+  // Get hostname and check if it matches
+  public static boolean isMyComputer() {
+      try {
+          String hostname = InetAddress.getLocalHost().getHostName();
+          String myHostname = MY_HOSTNAME;
+          return myHostname.equals(hostname);
+      } catch (Exception e) {
+          System.out.println("Error getting hostname: " + e.getMessage());
+          return false;
+      }
+  }
 
-	public static String getStrategyMlbUrl() {
-		return System.getenv("STRIKER_URL_MLB");
-	}
+  // Methods to get environment variables
+  public static String getRulesUrl() {
+    return System.getenv("STRIKER_URL_RULES");
+  }
 
-	public static String getSimulationUrl() {
-		return System.getenv("STRIKER_URL_SIMULATION");
-	}
+  public static String getChartsUrl() {
+    return System.getenv("STRIKER_URL_CHARTS");
+  }
 
-	public static String getSimulationDirectory() {
-		return System.getenv("STRIKER_SIMULATIONS");
-	}
+  public static String getSimulationsUrl() {
+    return System.getenv("STRIKER_URL_SIMULATIONS");
+  }
+
+  public static String unescapeJson(String str) {
+    StringBuilder result = new StringBuilder();
+    boolean isEscape = false;
+
+    for (char ch : str.toCharArray()) {
+      if (isEscape) {
+        switch (ch) {
+          case 'n':
+            result.append('\n');
+            break;
+          case '"':
+            result.append('"');
+            break;
+          case '\\':
+            result.append('\\');
+            break;
+          default:
+            result.append(ch);
+            break;
+        }
+        isEscape = false;
+      } else if (ch == '\\') {
+        isEscape = true; // Mark next character as escaped
+      } else {
+        result.append(ch);
+      }
+    }
+    return result.toString();
+  }
+
+  public static String stripQuotes(String str) {
+    if (str.length() > 1 && str.startsWith("\"") && str.endsWith("\"")) {
+      return str.substring(1, str.length() - 1);
+    }
+    return str;
+  }
 }
-
